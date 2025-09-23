@@ -2,11 +2,13 @@
 import { GoogleLogin } from "@react-oauth/google";
 import React, { useState } from "react";
 
-import { login, googleLogin } from "../api/auth";
+import { login, googleLogin } from "../services/auth";
 import loginImg from "../assets/login.png";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/hooks/useContext";
 
 const Login: React.FC = () => {
+  const { setUserData } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -14,9 +16,8 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const res = await login(email, password);
-      localStorage.setItem("token", res.access_token);
-      alert("Login exitoso");
-      window.location.href = "/home";
+      setUserData(res.access_token);
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
       alert("Error al iniciar sesión");
@@ -26,9 +27,8 @@ const Login: React.FC = () => {
   const handleGoogleLogin = async (credentialResponse: any) => {
     try {
       const res = await googleLogin(credentialResponse.credential);
-      localStorage.setItem("token", res.access_token);
-      alert("Login con Google exitoso");
-      window.location.href = "/home";
+      setUserData(res.access_token);
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
       alert("Error al iniciar sesión con Google");
@@ -94,6 +94,7 @@ const Login: React.FC = () => {
 
           <div className="flex justify-center">
             <GoogleLogin
+              width={330}
               onSuccess={handleGoogleLogin}
               onError={() => console.log("Error con Google")}
             />
