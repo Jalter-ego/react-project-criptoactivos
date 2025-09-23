@@ -1,12 +1,13 @@
 // src/App.tsx
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/login";
+import HomePage from "./pages/Home/HomePage";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/home" element={<h1 className="text-3xl font-bold">🏠 Bienvenido al Home</h1>} />
+      <Route path="/home" element={<HomePage />} />
     </Routes>
   );
 }
