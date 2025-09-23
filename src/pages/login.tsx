@@ -12,11 +12,11 @@ const Login: React.FC = () => {
     try {
       const res = await login(email, password);
       localStorage.setItem("token", res.access_token);
-      alert("Login exitoso ✅");
+      alert("Login exitoso");
       window.location.href = "/home";
     } catch (err) {
       console.error(err);
-      alert("Error al iniciar sesión ❌");
+      alert("Error al iniciar sesión");
     }
   };
 
@@ -24,11 +24,11 @@ const Login: React.FC = () => {
     try {
       const res = await googleLogin(credentialResponse.credential);
       localStorage.setItem("token", res.access_token);
-      alert("Login con Google exitoso ✅");
+      alert("Login con Google exitoso");
       window.location.href = "/home";
     } catch (err) {
       console.error(err);
-      alert("Error al iniciar sesión con Google ❌");
+      alert("Error al iniciar sesión con Google");
     }
   };
 
