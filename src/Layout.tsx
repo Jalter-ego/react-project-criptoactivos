@@ -1,36 +1,40 @@
+import Sidebar from "./components/Layout/Sidebar/Sidebar";
 import UserMenu from "@/components/Header/UserMenu";
-import React from "react";
+import React, { useState } from "react";
+import { IconMenu } from "./lib/icons";
 
 interface LayoutProps {
     children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     return (
         <div className='flex min-h-screen'>
-            <aside className='w-64 bg-sidebar flex flex-col fixed top-0 left-0 h-screen z-40 shadow-lg'>
-                <div className="flex flex-col items-center justify-center h-44 border-b">
-                    <svg width="76" height="68" viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg"><path d="M14 22H7V11H0V4h14v18zM28 22h-8l7.5-18h8L28 22z" fill="currentColor"></path><circle cx="20" cy="8" r="4" fill="currentColor"></circle></svg>
-                    <h2 className="text-2xl font-light">TRADINGVIEW</h2>
-                    <h3 className="text-lg font-light">SIMULATOR</h3>
-                </div>
-                <nav>
-                    <ul className='flex flex-col p-4 gap-2'>
-                        <li>
-                            <a href="#" className='block px-4 py-2 rounded hover:bg-accent hover:text-accent-foreground transition-colors'>Dashboard</a>
-                        </li>
-                        <li>
-                            <a href="#" className='block px-4 py-2 rounded hover:bg-accent hover:text-accent-foreground transition-colors'>Settings</a>
-                        </li>
-                        <li>
-                            <a href="#" className='block px-4 py-2 rounded hover:bg-accent hover:text-accent-foreground transition-colors'>Profile</a>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
-            <div className='flex-1 ml-64 flex flex-col min-h-screen'>
+            <Sidebar className="hidden md:flex" />
+            <Sidebar
+                className={`fixed top-0 left-0 h-screen z-50 bg-sidebar transition-transform duration-300 md:hidden
+                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+                onClose={() => setSidebarOpen(false)}
+            />
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-40 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            <div className='flex-1 flex flex-col min-h-screen'>
                 <div className='sticky top-0 z-30 bg-background shadow-md'>
                     <header className="flex items-center justify-between lg:px-8 lg:py-2 px-2">
+                        <button
+                            className="md:hidden p-2"
+                            onClick={() => setSidebarOpen(true)}
+                            aria-label="Abrir menú"
+                        >
+                            <IconMenu />
+                        </button>
                         <UserMenu setShowLogin={() => { }} />
                     </header>
                 </div>
