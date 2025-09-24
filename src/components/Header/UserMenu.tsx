@@ -32,8 +32,8 @@ export default function UserMenu({
                 ) : (
                     <IconUser size={30} />
                 )}
-                {user?.email && (
-                    <span className="text-sm">{user.email}</span>
+                {user?.name && (
+                    <span className="text-sm">{user.name}</span>
                 )}
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-72 font-medium">
