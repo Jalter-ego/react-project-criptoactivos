@@ -8,9 +8,6 @@ interface ItemSidebarProps {
 
 export default function ItemSidebar({ title, href, icon: Icon }: ItemSidebarProps) {
     const location = useLocation();
-    console.log(href);
-    console.log(location.pathname);
-    
     
     const isActive =
         href === "/"
@@ -22,8 +19,8 @@ export default function ItemSidebar({ title, href, icon: Icon }: ItemSidebarProp
             hover:bg-accent transition-colors
             ${isActive ? 'bg-accent text-[#eb5e28] font-medium' : 'text-ring hover:text-foreground'}`}>
             <Icon />
-            <a href={href} className=''>
-                {title}
+            <a href={href} className='text-[13px]'>
+                {title.toUpperCase()}
             </a>
         </li>
     )
