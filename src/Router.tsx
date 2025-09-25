@@ -3,6 +3,7 @@ import HomePage from "./pages/Home/HomePage";
 import LiveAreaPage from "./pages/LiveArea";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import SettingsPage from "./pages/Settings";
+import Prueba from "./pages/prueba";
 
 export function Router() {
     return (
@@ -11,6 +12,7 @@ export function Router() {
             <Route path = "/live-area" element={<LiveAreaPage/>}/>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/prueba" element={<Prueba />} />
         </Routes>
     )
 }
