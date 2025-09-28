@@ -1,67 +1,74 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
-const WS_API_URL = "wss://advanced-trade-ws.coinbase.com";
-
-const CHANNEL_NAMES = {
-  ticker: "ticker",
-};
-
+const NESTJS_WS_URL = "http://localhost:3000"; 
 const PRODUCT_IDS = [
-  "BTC-USD",
-  "ETH-USD",
-  "SOL-USD",
-  "ADA-USD",
-  "DOGE-USD",
-  "AVAX-USD",
-  "MATIC-USD",
-  "BNB-USD",
-  "XRP-USD",
-  "DOT-USD",
+  "BTC-USD", "ETH-USD", "SOL-USD", "ADA-USD", "DOGE-USD",
+  "AVAX-USD", "MATIC-USD","XRP-USD", "DOT-USD",
 ];
 
-export default function Prueba() {
-  const wsRef = useRef<WebSocket | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
+type TickerData = {
+  product_id: string;
+  price: string;
+  volume_24_h: string;
+};
+
+const initialTickers: Record<string, TickerData> = PRODUCT_IDS.reduce((acc, id) => {
+  acc[id] = { product_id: id, price: '---', volume_24_h: '---' };
+  return acc;
+}, {} as Record<string, TickerData>);
+
+
+export default function TickerTable() {
+  const [tickers, setTickers] = useState<Record<string, TickerData>>(initialTickers);
 
   useEffect(() => {
-    const ws = new WebSocket(WS_API_URL);
-    wsRef.current = ws;
+    const socket = io(NESTJS_WS_URL);
 
-    ws.onopen = () => {
-      // Suscribirse al canal ticker para varios pares
-      const subscribeMsg = {
-        type: "subscribe",
-        channel: CHANNEL_NAMES.ticker,
-        product_ids: PRODUCT_IDS,
-      };
-      ws.send(JSON.stringify(subscribeMsg));
-    };
+    socket.on("connect", () => {
+      console.log("Connected to NestJS WebSocket Gateway!");
+    });
 
-    ws.onmessage = (event) => {
-      setMessages((prev) => [...prev, event.data]);
-    };
+    socket.on("new_ticker", (data: TickerData) => {
+      console.log(data);
+      
+      setTickers(prevTickers => ({
+        ...prevTickers,
+        [data.product_id]: data,
+      }));
+    });
 
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket closed");
-    };
+    socket.on("disconnect", () => {
+      console.log("Disconnected from NestJS Gateway");
+    });
 
     return () => {
-      ws.close();
+      socket.disconnect();
     };
   }, []);
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-2">Coinbase WebSocket (Ticker - Todas las monedas)</h2>
-      <div className="h-96 overflow-auto bg-black text-green-400 p-2 rounded">
-        {messages.slice(-50).map((msg, idx) => (
-          <pre key={idx}>{msg}</pre>
-        ))}
-      </div>
+      <h2 className="text-xl font-bold mb-2">Simulador de Inversiones (Datos en Tiempo Real)</h2>
+      <table className="min-w-full bg-black text-green-400 rounded">
+        <thead>
+          <tr>
+            <th className="px-2 py-1 text-left">Moneda</th>
+            <th className="px-2 py-1 text-right">Precio (USD)</th>
+            <th className="px-2 py-1 text-right">Volumen 24h</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.values(tickers).map((ticker) => (
+            <tr key={ticker.product_id}>
+              <td className="px-2 py-1">{ticker.product_id}</td>
+              <td className="px-2 py-1 text-right">{parseFloat(ticker.price).toFixed(2)}</td>
+              <td className="px-2 py-1 text-right">{parseFloat(ticker.volume_24_h).toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-2 text-xs text-gray-400">Los datos se actualizan en tiempo real desde el servidor.</p>
     </div>
   );
 }
