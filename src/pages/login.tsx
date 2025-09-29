@@ -6,6 +6,7 @@ import { login, googleLogin, register } from "../services/auth";
 import loginImg from "../assets/login.png";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useContext";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const { setUserData } = useUser();
@@ -13,6 +14,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate()
 
   const handleRegister = async (e: React.FormEvent) =>{
     e.preventDefault()
@@ -30,7 +32,7 @@ const Login: React.FC = () => {
     try {
       const res = await login(email, password);
       setUserData(res.access_token);
-      window.location.href = "/dashboard";
+      navigate("/user/portafolio-config")
     } catch (err: any) {
       console.log(err);
       alert(err.message);
@@ -41,7 +43,7 @@ const Login: React.FC = () => {
     try {
       const res = await googleLogin(credentialResponse.credential);
       setUserData(res.access_token);
-      window.location.href = "/dashboard";
+      navigate("/user/portafolio-config")
     } catch (err) {
       console.error(err);
       alert("Error al iniciar sesión con Google");
