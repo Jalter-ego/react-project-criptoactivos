@@ -1,8 +1,8 @@
 // src/services/portafolioServices.ts
 import axios from "axios";
-import { apilocal } from "./api";
+import { api } from "./api";
 
-const API_URL = `${apilocal}/portafolio`;
+const API_URL = `${api}/portafolio`;
 
 // Interfaces para tipar la data en el frontend
 export interface Portafolio {

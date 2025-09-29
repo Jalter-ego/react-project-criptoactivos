@@ -5,6 +5,7 @@ import DashboardPage from "./pages/Dashboard/DashboardPage";
 import SettingsPage from "./pages/Settings";
 import Prueba from "./pages/prueba";
 import PortafolioConfig from "./pages/User/portafolioConfig";
+import TradePage from "./pages/TradePage";
 
 export function Router() {
     return (
@@ -15,6 +16,7 @@ export function Router() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/prueba" element={<Prueba />} />
             <Route path= "/user/portafolio-config" element={<PortafolioConfig/>} />
+            <Route path= "/trade/:id" element={<TradePage/>} />
         </Routes>
     )
 }

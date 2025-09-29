@@ -9,6 +9,7 @@ import {
 import { Switch } from "../ui/switch";
 import { useUser } from "@/hooks/useContext";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useNavigate } from "react-router-dom";
 
 interface UserMenuProps {
     setShowLogin: (value: boolean) => void;
@@ -18,6 +19,7 @@ export default function UserMenu({
 }: UserMenuProps) {
     const { user, logout } = useUser();
     const [darkMode, setDarkMode] = useDarkMode();
+    const navigate = useNavigate()
 
 
     return (
@@ -43,10 +45,17 @@ export default function UserMenu({
                         Iniciar Sesión
                     </DropdownMenuItem>
                 ) : (
-                    <DropdownMenuItem onClick={logout} className="text-red-500">
+                    <DropdownMenuItem
+                        onClick={() => {
+                            logout();  
+                            navigate("/");
+                        }}
+                        className="text-red-500"
+                    >
                         <IconUser size={30} />
                         Cerrar Sesión
                     </DropdownMenuItem>
+
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Ayuda</DropdownMenuItem>

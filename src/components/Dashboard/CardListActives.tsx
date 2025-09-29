@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Input } from "../ui/input";
 import { activeIcons } from "@/lib/activeIcons";
+import { useNavigate } from "react-router-dom";
+import { useActive } from "@/hooks/useActive";
 
 const PRODUCT_IDS = [
     "BTC-USD", "ETH-USD", "USDT-USD", "XRP-USD", "SOL-USD",
@@ -34,6 +36,8 @@ const initialTickers: Record<string, TickerData> = PRODUCT_IDS.reduce((acc, id) 
 export default function CardListActives() {
     const [tickers, setTickers] = useState<Record<string, TickerData>>(initialTickers);
     const [search, setSearch] = useState("");
+    const navigate = useNavigate();
+    const { setActive } = useActive();
 
     useEffect(() => {
         const socket = io(api);
@@ -61,6 +65,11 @@ export default function CardListActives() {
     const filteredTickers = Object.values(tickers).filter((ticker) =>
         ticker.product_id.toLowerCase().includes(search.toLowerCase())
     );
+
+    const handleClick = (ticker: TickerData) => {
+        setActive(ticker);          
+        navigate(`/trade/${ticker.product_id}`); 
+    };
     return (
         < div className="lg:col-span-1 bg-card rounded-md p-4 border shadow-lg overflow-auto" >
             <div className="border-b pb-4 mb-4">
@@ -84,7 +93,9 @@ export default function CardListActives() {
                 </thead>
                 <tbody>
                     {filteredTickers.map((ticker) => (
-                        <tr key={ticker.product_id} className="border-b">
+                        <tr key={ticker.product_id}
+                            className="border-b"
+                            onClick={() => handleClick(ticker)}>
                             <td className="px-2 py-2 flex items-center gap-2">
                                 <img
                                     src={activeIcons[ticker.product_id]}
