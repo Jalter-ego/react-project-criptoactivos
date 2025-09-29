@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:3000/auth";
+import { api } from "./api";
+
+const API_URL = `${api}/auth`;
 
 export const register = async (
   name: string,
