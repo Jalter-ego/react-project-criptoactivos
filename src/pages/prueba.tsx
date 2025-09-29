@@ -1,20 +1,31 @@
+import type { TickerData } from "@/services/active.service";
+import { api } from "@/services/api";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const NESTJS_WS_URL = "http://localhost:3000"; 
 const PRODUCT_IDS = [
-  "BTC-USD", "ETH-USD", "SOL-USD", "ADA-USD", "DOGE-USD",
-  "AVAX-USD", "MATIC-USD","XRP-USD", "DOT-USD",
+  "BTC-USD", "ETH-USD", "USDT-USD", "XRP-USD", "SOL-USD",
+  "DOGE-USD", "ADA-USD", "LINK-USD", "AVAX-USD",
+  "XLM-USD", "SUI-USD", "BCH-USD", "HBAR-USD",
+  "LTC-USD", "SHIB-USD", "CRO-USD", "DOT-USD",
+  "ENA-USD", "TAO-USD", "ETC-USD",
 ];
 
-type TickerData = {
-  product_id: string;
-  price: string;
-  volume_24_h: string;
-};
-
 const initialTickers: Record<string, TickerData> = PRODUCT_IDS.reduce((acc, id) => {
-  acc[id] = { product_id: id, price: '---', volume_24_h: '---' };
+  acc[id] = {
+    product_id: id,
+    price: '---',
+    volume_24_h: '---',
+    low_24_h: '---',
+    high_24_h: '---',
+    low_52_w: '---',
+    high_52_w: '---',
+    price_percent_chg_24_h: '---',
+    best_bid: '---',
+    best_ask: '---',
+    best_bid_quantity: '---',
+    best_ask_quantity: '---'
+  };
   return acc;
 }, {} as Record<string, TickerData>);
 
@@ -23,7 +34,7 @@ export default function TickerTable() {
   const [tickers, setTickers] = useState<Record<string, TickerData>>(initialTickers);
 
   useEffect(() => {
-    const socket = io(NESTJS_WS_URL);
+    const socket = io(api);
 
     socket.on("connect", () => {
       console.log("Connected to NestJS WebSocket Gateway!");
@@ -31,7 +42,7 @@ export default function TickerTable() {
 
     socket.on("new_ticker", (data: TickerData) => {
       console.log(data);
-      
+
       setTickers(prevTickers => ({
         ...prevTickers,
         [data.product_id]: data,
@@ -56,6 +67,8 @@ export default function TickerTable() {
             <th className="px-2 py-1 text-left">Moneda</th>
             <th className="px-2 py-1 text-right">Precio (USD)</th>
             <th className="px-2 py-1 text-right">Volumen 24h</th>
+            <th className="px-2 py-1 text-right">Mín 24h</th>
+            <th className="px-2 py-1 text-right">% Chg 24h</th> 
           </tr>
         </thead>
         <tbody>
@@ -64,6 +77,8 @@ export default function TickerTable() {
               <td className="px-2 py-1">{ticker.product_id}</td>
               <td className="px-2 py-1 text-right">{parseFloat(ticker.price).toFixed(2)}</td>
               <td className="px-2 py-1 text-right">{parseFloat(ticker.volume_24_h).toFixed(2)}</td>
+              <td className="px-2 py-1 text-right">{ticker.low_24_h}</td> 
+              <td className="px-2 py-1 text-right">{ticker.price_percent_chg_24_h}</td>
             </tr>
           ))}
         </tbody>
