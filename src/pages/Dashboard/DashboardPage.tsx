@@ -1,11 +1,13 @@
 import CardHeaders from "@/components/Dashboard/CardHeaders";
 import CardListActives from "@/components/Dashboard/CardListActives";
 import { Input } from "@/components/ui/input";
+import { usePortafolio } from "@/hooks/PortafolioContext";
 import Layout from "@/Layout";
 
 
 
 export default function DashboardPage() {
+    const { currentPortafolio } = usePortafolio();
     return (
         <Layout>
             <div className="w-full flex flex-col">
@@ -17,6 +19,7 @@ export default function DashboardPage() {
                             <p className="text-muted-foreground text-sm">Ultimas operaciones</p>
                         </div>
                         <Input type="text" placeholder="buscar..." />
+                        {currentPortafolio?.name}
                     </div>
 
                     <CardListActives/>
