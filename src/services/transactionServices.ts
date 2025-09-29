@@ -1,13 +1,11 @@
 // src/services/transactionServices.ts
 import axios from "axios";
-import { apilocal } from "./api";
+import { api } from "./api";
 
-const API_URL = `${apilocal}/transaction`;
+const API_URL = `${api}/transaction`;
 
-// Tipo para tipos de transacción
 export type TransactionType = "BUY" | "SELL";
 
-// Interfaces para tipar la data en el frontend
 export interface Transaction {
   id: string;
   type: TransactionType;
@@ -15,8 +13,7 @@ export interface Transaction {
   price: number;
   activeSymbol: string;
   portafolioId: string;
-  createdAt?: string; // por si tu backend devuelve fecha
-  updatedAt?: string;
+  createdAt?: string; 
 }
 
 export interface CreateTransaction {
