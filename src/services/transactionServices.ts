@@ -1,6 +1,7 @@
 // src/services/transactionServices.ts
 import axios from "axios";
 import { api } from "./api";
+import type { PortafolioWithHoldings } from "./portafolioServices";
 
 const API_URL = `${api}/transaction`;
 
@@ -33,7 +34,7 @@ export interface UpdateTransaction {
 }
 
 export const transactionServices = {
-  create: async (data: CreateTransaction): Promise<Transaction> => {
+  create: async (data: CreateTransaction): Promise<PortafolioWithHoldings> => { 
     const res = await axios.post(API_URL, data);
     return res.data;
   },
