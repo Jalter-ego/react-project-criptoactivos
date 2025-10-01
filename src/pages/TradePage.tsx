@@ -6,11 +6,16 @@ import { activeIcons } from "@/lib/activeIcons";
 import { transactionServices, type CreateTransaction, type TransactionType, type Transaction } from "@/services/transactionServices";
 import Layout from "@/Layout";
 import { Slider } from "@/components/ui/slider"
+import { portafolioServices, type Holding } from "@/services/portafolioServices";
 
 export default function TradePage() {
-    const { currentPortafolio } = usePortafolio();
+    const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
     const { id } = useParams<{ id: string }>();
     const { active } = useActive();
+    
+    // --> 3. Nuevo estado para guardar la tenencia (holding) actual de este activo
+    const [currentHolding, setCurrentHolding] = useState<Holding | null>(null);
+
     const [amountUSD, setAmountUSD] = useState<number>(0);
     const [transactionType, setTransactionType] = useState<TransactionType>("BUY");
     const [isLoading, setIsLoading] = useState(false);
@@ -20,43 +25,67 @@ export default function TradePage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [currentPrice, setCurrentPrice] = useState(active ? parseFloat(active.price) : 0);
 
+    // Efecto para el precio (sin cambios)
     useEffect(() => {
         const interval = setInterval(() => {
             if (active) {
                 const fluctuation = (Math.random() - 0.5) * 0.02 * parseFloat(active.price);
-                setCurrentPrice(prev => prev + fluctuation);
+                setCurrentPrice(prev => Math.max(0, prev + fluctuation)); // Evitar precios negativos
             }
         }, 5000);
         return () => clearInterval(interval);
     }, [active]);
 
+    // --> 4. Efecto MEJORADO para cargar TODOS los datos necesarios
     useEffect(() => {
-        if (currentPortafolio) {
-            transactionServices.findAllByUser(currentPortafolio.id).then(setTransactions).catch(() => setError("Error al cargar historial"));
-        }
-    }, [currentPortafolio]);
+        if (currentPortafolio && id) {
+            // Cargar historial de transacciones
+            transactionServices.findAllByUser(currentPortafolio.userId).then(setTransactions).catch(() => setError("Error al cargar historial"));
 
-    console.log(id);
-    console.log(active);
-    console.log(currentPortafolio);
+            // Cargar el estado actual del portafolio, incluyendo los holdings
+            portafolioServices.findOne(currentPortafolio.id)
+                .then(fullPortafolio => {
+                    // Actualizamos el contexto por si acaso tiene datos desactualizados
+                    setCurrentPortafolio(fullPortafolio);
+                    // Buscamos si tenemos este activo en particular
+                    const holdingForAsset = fullPortafolio.holdings.find(h => h.activeSymbol === id);
+                    setCurrentHolding(holdingForAsset || null);
+                })
+                .catch(() => setError("Error al cargar datos del portafolio."));
+        }
+    }, [currentPortafolio?.id, id,currentPortafolio]); // Depende del ID del portafolio y del activo
 
     if (!id || !active || !currentPortafolio) {
         return (
             <Layout>
-                <p className="text-center text-red-500">No hay datos suficientes para mostrar la página de trading.</p>
+                <p className="text-center text-red-500">Cargando datos o datos insuficientes...</p>
             </Layout>
         );
     }
-
+    
     const symbol = id;
     const imageUrl = activeIcons[symbol] || "https://via.placeholder.com/64";
+    
+    // Datos del portafolio actualizados
     const availableCash = currentPortafolio.cash;
+    const availableAssetQuantity = currentHolding?.quantity || 0;
+
+    // --> 5. Lógica dinámica para el valor máximo del slider
+    const maxSliderValue = transactionType === 'BUY'
+        ? availableCash
+        : availableAssetQuantity * currentPrice;
+
     const calculatedQuantity = amountUSD > 0 && currentPrice > 0 ? amountUSD / currentPrice : 0;
-    const isInvalid = amountUSD <= 0 || (transactionType === "BUY" && amountUSD > availableCash) || isNaN(calculatedQuantity);
+    
+    // --> 6. Lógica de validación MEJORADA
+    const isInvalid = amountUSD <= 0 ||
+        (transactionType === "BUY" && amountUSD > availableCash) ||
+        (transactionType === "SELL" && calculatedQuantity > availableAssetQuantity) ||
+        isNaN(calculatedQuantity);
 
     const handleTransaction = async () => {
         if (isInvalid) {
-            setError(transactionType === "BUY" ? "Monto inválido o fondos insuficientes." : "Monto inválido.");
+            setError(transactionType === "BUY" ? "Monto inválido o fondos insuficientes." : "Monto inválido o no posees suficientes activos.");
             return;
         }
 
@@ -72,13 +101,23 @@ export default function TradePage() {
                 activeSymbol: symbol,
                 portafolioId: currentPortafolio.id,
             };
-            await transactionServices.create(data);
+            
+            // --> 7. El servicio ahora devuelve el portafolio actualizado
+            const updatedPortafolio = await transactionServices.create(data);
+            
+            // --> 8. Actualizamos el estado global (Context)
+            setCurrentPortafolio(updatedPortafolio);
+            
             setSuccess(`Transacción de ${transactionType === "BUY" ? "compra" : "venta"} realizada con éxito.`);
             setAmountUSD(0);
             setShowModal(false);
-            transactionServices.findAllByUser(currentPortafolio.id).then(setTransactions);
-        } catch (err) {
-            setError("Error al procesar la transacción. Intenta nuevamente.");
+            
+            // Refrescamos el historial
+            transactionServices.findAllByUser(currentPortafolio.userId).then(setTransactions);
+        } catch (err: any) {
+            // Mostrar error del backend si está disponible
+            const errorMessage = err.response?.data?.message || "Error al procesar la transacción. Intenta nuevamente.";
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -100,9 +139,10 @@ export default function TradePage() {
                         <p className="mt-2 text-sm text-gray-500">Precio actualizado en tiempo real</p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
-                        <h2 className="text-lg font-semibold mb-2">Tu Portafolio</h2>
-                        <p>Dinero disponible: ${availableCash.toFixed(2)}</p>
-                    </div>
+                         <h2 className="text-lg font-semibold mb-2">Tu Portafolio</h2>
+                         <p>Dinero disponible: ${availableCash.toFixed(2)}</p>
+                         <p>Posees: {availableAssetQuantity.toFixed(6)} {symbol}</p>
+                     </div>
                 </div>
 
                 <div className="mb-8">
@@ -121,13 +161,11 @@ export default function TradePage() {
                             Vender
                         </button>
                     </div>
-                    <div className="mb-4">
-                        <label htmlFor="amountUSD" className="block text-sm font-medium text-gray-700">
-                            Monto en USD:
-                        </label>
+                     <div className="mb-4">
+                        <label>Monto en USD:</label>
                         <Slider
-                            value={[amountUSD]} 
-                            max={availableCash} 
+                            value={[amountUSD]}
+                            max={maxSliderValue}
                             step={0.01}
                             onValueChange={(val) => setAmountUSD(val[0])}
                             className="py-2"
@@ -135,10 +173,10 @@ export default function TradePage() {
                         <p className="mt-2 text-sm text-gray-600">${amountUSD.toFixed(2)}</p>
                     </div>
 
-                    <div className="text-center">
+                     <div className="text-center">
                         <p>Cantidad aproximada de {symbol}: {calculatedQuantity.toFixed(6)}</p>
-                        {transactionType === "BUY" && amountUSD > availableCash && (
-                            <p className="text-red-500">Fondos insuficientes.</p>
+                        {transactionType === "SELL" && calculatedQuantity > availableAssetQuantity && (
+                            <p className="text-red-500">No posees suficientes {symbol} para vender.</p>
                         )}
                     </div>
                     {error && <p className="text-red-500 mt-2">{error}</p>}
