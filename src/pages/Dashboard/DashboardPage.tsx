@@ -3,6 +3,7 @@ import CardListActives from "@/components/Dashboard/CardListActives";
 import { Input } from "@/components/ui/input";
 import { usePortafolio } from "@/hooks/PortafolioContext";
 import Layout from "@/Layout";
+import TradingViewWidget from "../TradingViewWidget";
 
 
 
@@ -21,6 +22,7 @@ export default function DashboardPage() {
                         <Input type="text" placeholder="buscar..." />
                         {currentPortafolio?.name}
                     </div>
+
 
                     <CardListActives/>
                 </section>

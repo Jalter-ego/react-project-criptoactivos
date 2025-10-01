@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useActive } from "@/hooks/useActive";
 import { usePortafolio } from "@/hooks/PortafolioContext";
 import { useState, useEffect } from "react";
@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider"
 
 export default function TradePage() {
     const { currentPortafolio } = usePortafolio();
+    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { active } = useActive();
     const [amountUSD, setAmountUSD] = useState<number>(0);
@@ -179,7 +180,12 @@ export default function TradePage() {
                         </div>
                     </div>
                 )}
-
+                <button
+                    onClick={() => navigate("/live-area")}
+                    className="px-6 py-3 bg-blue-600 rounded-lg shadow-md hover:bg-blue-500 transition"
+                    >
+                    Ver Live Area Chart
+                </button>
                 {/* Transaction History */}
                 <div className="mt-8">
                     <h2 className="text-lg font-semibold mb-4">Historial de Transacciones</h2>

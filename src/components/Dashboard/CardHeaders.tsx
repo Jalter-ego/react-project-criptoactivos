@@ -1,7 +1,9 @@
+import { usePortafolio } from "@/hooks/PortafolioContext";
 import { IconCard, IconChartBar, IconRefresh, IconTrophy, IconUser } from "@/lib/icons";
 
 
 export default function CardHeaders(){
+    const { currentPortafolio } = usePortafolio();
     return(
         <section className="w-full flex max-md:flex-col gap-6 py-2">
                     <div className="w-full h-32 bg-card rounded-md p-3 border shadow-lg">
@@ -11,7 +13,7 @@ export default function CardHeaders(){
                             </div>
                             <div>
                                 <p className="text-right">Capital total</p>
-                                <p className="text-3xl">$10000.00</p>
+                                <p className="text-3xl">${currentPortafolio?.cash}</p>
                             </div>
                         </div>
                         <div className="flex items-center mt-2 text-sm gap-1 text-muted-foreground">
