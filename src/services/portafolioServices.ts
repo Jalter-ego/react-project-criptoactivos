@@ -4,7 +4,21 @@ import { api } from "./api";
 
 const API_URL = `${api}/portafolio`;
 
-// Interfaces para tipar la data en el frontend
+export interface Holding {
+  id: string;
+  quantity: number;
+  portafolioId: string;
+  activeSymbol: string;
+}
+
+export interface PortafolioWithHoldings {
+  id: string;
+  name: string;
+  cash: number;
+  userId: string;
+  holdings: Holding[];
+}
+
 export interface Portafolio {
   id: string;
   name: string;
@@ -35,12 +49,12 @@ export const portafolioServices = {
     return res.data;
   },
 
-  findAllByUser: async (userId: string): Promise<Portafolio[]> => {
+  findAllByUser: async (userId: string): Promise<PortafolioWithHoldings[]> => {
     const res = await axios.get(`${API_URL}/user/${userId}`);
     return res.data;
   },
 
-  findOne: async (id: string): Promise<Portafolio> => {
+  findOne: async (id: string): Promise<PortafolioWithHoldings> => {
     const res = await axios.get(`${API_URL}/${id}`);
     return res.data;
   },
