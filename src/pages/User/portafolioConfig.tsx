@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import F1Bg from "../../assets/backgroungPortafolio.png";
 import { portafolioServices } from "../../services/portafolioServices";
-import type { Portafolio, CreatePortafolio, UpdatePortafolio } from "../../services/portafolioServices";
+import type { PortafolioWithHoldings, CreatePortafolio, UpdatePortafolio } from "../../services/portafolioServices";
 import { useUser } from "../../hooks/useContext";
 import { usePortafolio } from "@/hooks/PortafolioContext";
 import { useNavigate } from "react-router-dom";
 
 const PortafolioConfig: React.FC = () => {
 	const { user } = useUser();
-	const [portafolios, setPortafolios] = useState<Portafolio[]>([]);
+	const [portafolios, setPortafolios] = useState<PortafolioWithHoldings[]>([]);
 	const [form, setForm] = useState<CreatePortafolio>({ name: "", cash: 0, userId: user?.id || "" });
 	const [editId, setEditId] = useState<string | null>(null);
 	const [editForm, setEditForm] = useState<UpdatePortafolio>({ name: "", cash: 0 });
@@ -58,7 +58,7 @@ const PortafolioConfig: React.FC = () => {
 		}
 	};
 
-	const handleEdit = (portafolio: Portafolio) => {
+	const handleEdit = (portafolio: PortafolioWithHoldings) => {
 		setEditId(portafolio.id);
 		setEditForm({ name: portafolio.name, cash: portafolio.cash });
 	};
@@ -93,7 +93,7 @@ const PortafolioConfig: React.FC = () => {
 		}
 	};
 
-	const handleSelectPortafolio = (p: Portafolio) => {
+	const handleSelectPortafolio = (p: PortafolioWithHoldings) => {
 		setCurrentPortafolio(p);
 		navigate("/dashboard");
 	};
