@@ -6,6 +6,7 @@ import SettingsPage from "./pages/Settings";
 import Prueba from "./pages/prueba";
 import PortafolioConfig from "./pages/User/portafolioConfig";
 import TradePage from "./pages/TradePage";
+import DetailedActivesTable from "./pages/AssetsPage";
 
 export function Router() {
     return (
@@ -13,6 +14,7 @@ export function Router() {
             <Route path="/" element={<HomePage />} />
             <Route path = "/live-area" element={<LiveAreaPage/>}/>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/activos" element={<DetailedActivesTable />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/prueba" element={<Prueba />} />
             <Route path= "/user/portafolio-config" element={<PortafolioConfig/>} />

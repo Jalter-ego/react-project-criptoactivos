@@ -7,13 +7,13 @@ import { transactionServices, type CreateTransaction, type TransactionType, type
 import Layout from "@/Layout";
 import { Slider } from "@/components/ui/slider"
 import { portafolioServices, type Holding } from "@/services/portafolioServices";
+import TransactionsHistory from "@/components/TradePage/TransactionsHistory";
+import { Button } from "@/components/ui/button";
 
 export default function TradePage() {
     const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
     const { id } = useParams<{ id: string }>();
     const { active } = useActive();
-    
-    // --> 3. Nuevo estado para guardar la tenencia (holding) actual de este activo
     const [currentHolding, setCurrentHolding] = useState<Holding | null>(null);
 
     const [amountUSD, setAmountUSD] = useState<number>(0);
@@ -25,12 +25,11 @@ export default function TradePage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [currentPrice, setCurrentPrice] = useState(active ? parseFloat(active.price) : 0);
 
-    // Efecto para el precio (sin cambios)
     useEffect(() => {
         const interval = setInterval(() => {
             if (active) {
                 const fluctuation = (Math.random() - 0.5) * 0.02 * parseFloat(active.price);
-                setCurrentPrice(prev => Math.max(0, prev + fluctuation)); // Evitar precios negativos
+                setCurrentPrice(prev => Math.max(0, prev + fluctuation));
             }
         }, 5000);
         return () => clearInterval(interval);
@@ -40,7 +39,9 @@ export default function TradePage() {
     useEffect(() => {
         if (currentPortafolio && id) {
             // Cargar historial de transacciones
-            transactionServices.findAllByUser(currentPortafolio.userId).then(setTransactions).catch(() => setError("Error al cargar historial"));
+            transactionServices.findAllByPortafolioAndActive(currentPortafolio.id, id)
+                .then(setTransactions)
+                .catch(() => setError("Error al cargar historial"));
 
             // Cargar el estado actual del portafolio, incluyendo los holdings
             portafolioServices.findOne(currentPortafolio.id)
@@ -53,7 +54,7 @@ export default function TradePage() {
                 })
                 .catch(() => setError("Error al cargar datos del portafolio."));
         }
-    }, [currentPortafolio?.id, id,currentPortafolio]); // Depende del ID del portafolio y del activo
+    }, [currentPortafolio?.id, id]); // Depende del ID del portafolio y del activo
 
     if (!id || !active || !currentPortafolio) {
         return (
@@ -62,10 +63,10 @@ export default function TradePage() {
             </Layout>
         );
     }
-    
+
     const symbol = id;
     const imageUrl = activeIcons[symbol] || "https://via.placeholder.com/64";
-    
+
     // Datos del portafolio actualizados
     const availableCash = currentPortafolio.cash;
     const availableAssetQuantity = currentHolding?.quantity || 0;
@@ -76,7 +77,7 @@ export default function TradePage() {
         : availableAssetQuantity * currentPrice;
 
     const calculatedQuantity = amountUSD > 0 && currentPrice > 0 ? amountUSD / currentPrice : 0;
-    
+
     // --> 6. Lógica de validación MEJORADA
     const isInvalid = amountUSD <= 0 ||
         (transactionType === "BUY" && amountUSD > availableCash) ||
@@ -101,19 +102,19 @@ export default function TradePage() {
                 activeSymbol: symbol,
                 portafolioId: currentPortafolio.id,
             };
-            
+
             // --> 7. El servicio ahora devuelve el portafolio actualizado
             const updatedPortafolio = await transactionServices.create(data);
-            
+
             // --> 8. Actualizamos el estado global (Context)
             setCurrentPortafolio(updatedPortafolio);
-            
+
             setSuccess(`Transacción de ${transactionType === "BUY" ? "compra" : "venta"} realizada con éxito.`);
             setAmountUSD(0);
             setShowModal(false);
-            
+
             // Refrescamos el historial
-            transactionServices.findAllByUser(currentPortafolio.userId).then(setTransactions);
+            transactionServices.findAllByPortafolio(currentPortafolio.userId).then(setTransactions);
         } catch (err: any) {
             // Mostrar error del backend si está disponible
             const errorMessage = err.response?.data?.message || "Error al procesar la transacción. Intenta nuevamente.";
@@ -125,43 +126,43 @@ export default function TradePage() {
 
     return (
         <Layout>
-            <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+            <div className="max-w-4xl mx-auto bg-card p-8 rounded-xl shadow-lg">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-3xl font-bold">Trading: {symbol}</h1>
                     <img src={imageUrl} alt={symbol} className="w-20 h-20 rounded-full" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-card2 p-4 rounded-lg text-foreground">
                         <h2 className="text-lg font-semibold mb-2">Información del Activo</h2>
                         <p className="text-lg">Precio actual: ${currentPrice.toFixed(2)}</p>
                         <p>Volumen 24h: {active.volume_24_h}</p>
                         <p className="mt-2 text-sm text-gray-500">Precio actualizado en tiempo real</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                         <h2 className="text-lg font-semibold mb-2">Tu Portafolio</h2>
-                         <p>Dinero disponible: ${availableCash.toFixed(2)}</p>
-                         <p>Posees: {availableAssetQuantity.toFixed(6)} {symbol}</p>
-                     </div>
+                    <div className="bg-card2 p-4 rounded-lg">
+                        <h2 className="text-lg font-semibold mb-2">Tu Portafolio</h2>
+                        <p>Dinero disponible: ${availableCash.toFixed(2)}</p>
+                        <p>Posees: {availableAssetQuantity.toFixed(6)} {symbol}</p>
+                    </div>
                 </div>
 
                 <div className="mb-8">
                     <h2 className="text-lg font-semibold mb-4">Realizar Transacción</h2>
                     <div className="flex gap-4 mb-4">
-                        <button
+                        <Button
                             onClick={() => setTransactionType("BUY")}
-                            className={`py-2 px-4 rounded-md ${transactionType === "BUY" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                            className={`py-2 px-4 rounded-md ${transactionType === "BUY" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
                         >
                             Comprar
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={() => setTransactionType("SELL")}
-                            className={`py-2 px-4 rounded-md ${transactionType === "SELL" ? "bg-red-500 text-white" : "bg-gray-200"}`}
+                            className={`py-2 px-4 rounded-md ${transactionType === "SELL" ? "bg-red-500 text-white" : "bg-gray-400"}`}
                         >
                             Vender
-                        </button>
+                        </Button>
                     </div>
-                     <div className="mb-4">
+                    <div className="mb-4">
                         <label>Monto en USD:</label>
                         <Slider
                             value={[amountUSD]}
@@ -170,10 +171,10 @@ export default function TradePage() {
                             onValueChange={(val) => setAmountUSD(val[0])}
                             className="py-2"
                         />
-                        <p className="mt-2 text-sm text-gray-600">${amountUSD.toFixed(2)}</p>
+                        <p className="mt-2 text-sm text-foreground">${amountUSD.toFixed(2)}</p>
                     </div>
 
-                     <div className="text-center">
+                    <div className="text-center">
                         <p>Cantidad aproximada de {symbol}: {calculatedQuantity.toFixed(6)}</p>
                         {transactionType === "SELL" && calculatedQuantity > availableAssetQuantity && (
                             <p className="text-red-500">No posees suficientes {symbol} para vender.</p>
@@ -181,18 +182,18 @@ export default function TradePage() {
                     </div>
                     {error && <p className="text-red-500 mt-2">{error}</p>}
                     {success && <p className="text-green-500 mt-2">{success}</p>}
-                    <button
+                    <Button
                         onClick={() => setShowModal(true)}
                         disabled={isInvalid}
                         className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
                     >
                         {isLoading ? "Procesando..." : `Confirmar ${transactionType === "BUY" ? "Compra" : "Venta"}`}
-                    </button>
+                    </Button>
                 </div>
 
                 {showModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                        <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                    <div className="fixed inset-0 z-40 bg-black/20 bg-opacity-50 flex items-center justify-center">
+                        <div className="bg-card p-6 rounded-lg shadow-lg max-w-sm w-full">
                             <h2 className="text-xl font-bold mb-4">Confirmar Transacción</h2>
                             <p>Tipo: {transactionType}</p>
                             <p>Activo: {symbol}</p>
@@ -200,54 +201,28 @@ export default function TradePage() {
                             <p>Cantidad: {calculatedQuantity.toFixed(6)} {symbol}</p>
                             <p>Precio por unidad: ${currentPrice.toFixed(2)}</p>
                             <div className="flex gap-4 mt-6">
-                                <button
+                                <Button
                                     onClick={() => setShowModal(false)}
-                                    className="flex-1 bg-gray-300 py-2 rounded-md"
+                                    className="flex-1 bg-gray-600 text-white py-2 rounded-md"
                                 >
                                     Cancelar
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     onClick={handleTransaction}
                                     disabled={isLoading}
                                     className="flex-1 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
                                 >
                                     {isLoading ? "Procesando..." : "Confirmar"}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
                 )}
+                <h2 className="text-lg font-semibold">Historial de Transacciones</h2>
+                <TransactionsHistory
+                    transactions={transactions}
+                />
 
-                {/* Transaction History */}
-                <div className="mt-8">
-                    <h2 className="text-lg font-semibold mb-4">Historial de Transacciones</h2>
-                    {transactions.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border">
-                                <thead>
-                                    <tr>
-                                        <th className="py-2 px-4 border-b">Tipo</th>
-                                        <th className="py-2 px-4 border-b">Cantidad</th>
-                                        <th className="py-2 px-4 border-b">Precio</th>
-                                        <th className="py-2 px-4 border-b">Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {transactions.map((tx) => (
-                                        <tr key={tx.id}>
-                                            <td className="py-2 px-4 border-b">{tx.type}</td>
-                                            <td className="py-2 px-4 border-b">{tx.amount.toFixed(6)} {symbol}</td>
-                                            <td className="py-2 px-4 border-b">${tx.price.toFixed(2)}</td>
-                                            <td className="py-2 px-4 border-b">{tx.createdAt ? new Date(tx.createdAt).toLocaleString() : "-"}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <p>No hay transacciones recientes.</p>
-                    )}
-                </div>
             </div>
         </Layout>
     );
