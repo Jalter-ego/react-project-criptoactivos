@@ -124,7 +124,7 @@ const PortafolioConfig: React.FC = () => {
 					<input
 						type="number"
 						name="cash"
-						value={form.cash}
+						value={form.cash.toFixed(2)}
 						onChange={handleChange}
 						placeholder="Dinero inicial"
 						className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-gray-400 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -159,7 +159,7 @@ const PortafolioConfig: React.FC = () => {
 										<input
 											type="number"
 											name="cash"
-											value={editForm.cash}
+											value={editForm.cash?.toFixed(2)}
 											onChange={handleEditChange}
 											className="px-2 py-1 border border-gray-300 rounded bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
 											required
@@ -171,7 +171,7 @@ const PortafolioConfig: React.FC = () => {
 									<div className="flex flex-col md:flex-row md:items-center w-full justify-between">
 										<div>
 											<span className="font-semibold text-gray-900 dark:text-gray-100">{p.name}</span>
-											<span className="ml-4 text-gray-700 dark:text-gray-300">${p.cash}</span>
+											<span className="ml-4 text-gray-700 dark:text-gray-300">${p.cash.toFixed(2)}</span>
 										</div>
 										<div className="flex gap-2 mt-2 md:mt-0">
 											<button

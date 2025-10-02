@@ -13,7 +13,7 @@ export default function CardHeaders(){
                             </div>
                             <div>
                                 <p className="text-right">Capital total</p>
-                                <p className="text-3xl">{currentPortafolio?.cash}</p>
+                                <p className="text-3xl">${currentPortafolio?.cash.toFixed(2)}</p>
                             </div>
                         </div>
                         <div className="flex items-center mt-2 text-sm gap-1 text-muted-foreground">
