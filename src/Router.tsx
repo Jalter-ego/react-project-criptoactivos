@@ -12,13 +12,13 @@ export function Router() {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path = "/live-area" element={<LiveAreaPage/>}/>
+            <Route path="/live-area/:symbol" element={<LiveAreaPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/activos" element={<DetailedActivesTable />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/prueba" element={<Prueba />} />
-            <Route path= "/user/portafolio-config" element={<PortafolioConfig/>} />
-            <Route path= "/trade/:id" element={<TradePage/>} />
+            <Route path="/user/portafolio-config" element={<PortafolioConfig />} />
+            <Route path="/trade/:id" element={<TradePage />} />
         </Routes>
-    )
+    );
 }
