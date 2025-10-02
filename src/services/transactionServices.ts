@@ -44,8 +44,13 @@ export const transactionServices = {
     return res.data;
   },
 
-  findAllByUser: async (userId: string): Promise<Transaction[]> => {
-    const res = await axios.get(`${API_URL}/user/${userId}`);
+  findAllByPortafolio: async (portafolioId: string): Promise<Transaction[]> => {
+    const res = await axios.get(`${API_URL}/portafolio/${portafolioId}`);
+    return res.data;
+  },
+
+  findAllByPortafolioAndActive: async (portafolioId: string,symbol:string): Promise<Transaction[]> => {
+    const res = await axios.get(`${API_URL}/portafolio/${portafolioId}/active/${symbol}`);
     return res.data;
   },
 
