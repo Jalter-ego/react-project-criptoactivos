@@ -114,7 +114,7 @@ export default function TradePage() {
             setShowModal(false);
 
             // Refrescamos el historial
-            transactionServices.findAllByPortafolio(currentPortafolio.userId).then(setTransactions);
+            transactionServices.findAllByPortafolioAndActive(currentPortafolio.id,id).then(setTransactions);
         } catch (err: any) {
             // Mostrar error del backend si está disponible
             const errorMessage = err.response?.data?.message || "Error al procesar la transacción. Intenta nuevamente.";
