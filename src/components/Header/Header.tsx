@@ -15,6 +15,17 @@ export default function Header() {
                 <div>
                     <h1 className="text-2xl font-medium">TradingView</h1>
                 </div>
+                <div className="flex gap-x-6 text-md font-semibold">
+                    <p>
+                        Productos
+                    </p>
+                    <p>
+                        Comunidad
+                    </p>
+                    <p>
+                        Más
+                    </p>
+                </div>
                 <div>
                     <UserMenu
                         setShowLogin={setShowLogin}
