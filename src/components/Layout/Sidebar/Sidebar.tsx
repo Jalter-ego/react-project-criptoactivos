@@ -9,7 +9,7 @@ interface sidebarProps{
 
 export default function Sidebar({className,onClose}:sidebarProps) {
     return (
-        <aside className={`w-64 bg-sidebar flex flex-col h-screen shadow-lg ${className}`}>
+        <aside className={`w-64 bg-sidebar flex flex-col h-screen shadow-lg ${className} border-b border-1`}>
             <div className="flex flex-col items-center justify-center h-44 border-b relative">
                 {onClose && (
                     <button
