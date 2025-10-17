@@ -9,11 +9,13 @@ import { Slider } from "@/components/ui/slider"
 import { portafolioServices, type Holding } from "@/services/portafolioServices";
 import TransactionsHistory from "@/components/TradePage/TransactionsHistory";
 import { Button } from "@/components/ui/button";
+import { socket } from "@/services/socket";
+import type { TickerData } from "@/services/active.service";
 
 export default function TradePage() {
     const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
     const { id } = useParams<{ id: string }>();
-    const { active } = useActive();
+    const { active, setActive } = useActive();
     const [currentHolding, setCurrentHolding] = useState<Holding | null>(null);
 
     const [amountUSD, setAmountUSD] = useState<number>(0);
@@ -23,38 +25,46 @@ export default function TradePage() {
     const [success, setSuccess] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [currentPrice, setCurrentPrice] = useState(active ? parseFloat(active.price) : 0);
+    const [currentPrice, setCurrentPrice] = useState(
+        active && active.price !== "---" ? parseFloat(active.price) : 0,
+    );
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (active) {
-                const fluctuation = (Math.random() - 0.5) * 0.02 * parseFloat(active.price);
-                setCurrentPrice(prev => Math.max(0, prev + fluctuation));
-            }
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [active]);
+        if (!id) return; 
+        if (socket.disconnected) {
+            socket.connect();
+        }
+        socket.emit('subscribe_to_active', id);
 
-    // --> 4. Efecto MEJORADO para cargar TODOS los datos necesarios
+        const handleTickerUpdate = (data: TickerData) => {
+            if (data.product_id === id) {
+                setCurrentPrice(parseFloat(data.price));
+                setActive(data);
+            }
+        };
+
+        socket.on('ticker_update', handleTickerUpdate);
+        return () => {
+            socket.emit('unsubscribe_from_active', id);
+            socket.off('ticker_update', handleTickerUpdate);
+        };
+    }, [id, setActive]);
+
     useEffect(() => {
         if (currentPortafolio && id) {
-            // Cargar historial de transacciones
             transactionServices.findAllByPortafolioAndActive(currentPortafolio.id, id)
                 .then(setTransactions)
                 .catch(() => setError("Error al cargar historial"));
 
-            // Cargar el estado actual del portafolio, incluyendo los holdings
             portafolioServices.findOne(currentPortafolio.id)
                 .then(fullPortafolio => {
-                    // Actualizamos el contexto por si acaso tiene datos desactualizados
                     setCurrentPortafolio(fullPortafolio);
-                    // Buscamos si tenemos este activo en particular
                     const holdingForAsset = fullPortafolio.holdings.find(h => h.activeSymbol === id);
                     setCurrentHolding(holdingForAsset || null);
                 })
                 .catch(() => setError("Error al cargar datos del portafolio."));
         }
-    }, [currentPortafolio?.id, id]); // Depende del ID del portafolio y del activo
+    }, [currentPortafolio?.id, id]); 
 
     if (!id || !active || !currentPortafolio) {
         return (
@@ -103,20 +113,15 @@ export default function TradePage() {
                 portafolioId: currentPortafolio.id,
             };
 
-            // --> 7. El servicio ahora devuelve el portafolio actualizado
             const updatedPortafolio = await transactionServices.create(data);
-
-            // --> 8. Actualizamos el estado global (Context)
             setCurrentPortafolio(updatedPortafolio);
 
             setSuccess(`Transacción de ${transactionType === "BUY" ? "compra" : "venta"} realizada con éxito.`);
             setAmountUSD(0);
             setShowModal(false);
 
-            // Refrescamos el historial
             transactionServices.findAllByPortafolioAndActive(currentPortafolio.id,id).then(setTransactions);
         } catch (err: any) {
-            // Mostrar error del backend si está disponible
             const errorMessage = err.response?.data?.message || "Error al procesar la transacción. Intenta nuevamente.";
             setError(errorMessage);
         } finally {
