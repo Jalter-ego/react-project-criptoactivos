@@ -38,6 +38,13 @@ export interface UpdatePortafolio {
   userId?: string;
 }
 
+export interface PortafolioSnapshot {
+  id: string;
+  value: number;
+  timestamp: string;
+  portafolioId: string;
+}
+
 export const portafolioServices = {
   create: async (data: CreatePortafolio): Promise<Portafolio> => {
     const res = await axios.post(API_URL, data);
@@ -56,6 +63,11 @@ export const portafolioServices = {
 
   findOne: async (id: string): Promise<PortafolioWithHoldings> => {
     const res = await axios.get(`${API_URL}/${id}`);
+    return res.data;
+  },
+
+  findSnapshots: async (portafolioId: string): Promise<PortafolioSnapshot[]> => {
+    const res = await axios.get(`${API_URL}/${portafolioId}/snapshots`);
     return res.data;
   },
 
