@@ -32,7 +32,7 @@ interface TransactionsHistoryProps {
 
 export default function TransactionsHistory({ transactions }: TransactionsHistoryProps) {
     console.log(transactions);
-    
+
     return (
         <div className="mt-8">
             {transactions.length > 0 ? (
@@ -71,7 +71,8 @@ export default function TransactionsHistory({ transactions }: TransactionsHistor
                                     <td className="py-2 px-4 border-b text-center">${tx.price.toFixed(2)}</td>
                                     <td className="py-2 px-4 border-b text-center">
                                         {tx.createdAt ? timeAgo(new Date(tx.createdAt)) : "-"}
-                                    </td>                                </tr>
+                                    </td>                                
+                                </tr>
                             ))}
                         </tbody>
                     </table>
