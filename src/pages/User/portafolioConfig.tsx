@@ -124,7 +124,7 @@ const PortafolioConfig: React.FC = () => {
 					<input
 						type="number"
 						name="cash"
-						value={form.cash.toFixed(2)}
+						value={form.cash}
 						onChange={handleChange}
 						placeholder="Dinero inicial"
 						className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-gray-400 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
