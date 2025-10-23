@@ -5,7 +5,7 @@ import DashboardPage from "./pages/Dashboard/DashboardPage";
 import SettingsPage from "./pages/Settings";
 import Prueba from "./pages/prueba";
 import PortafolioConfig from "./pages/User/portafolioConfig";
-import TradePage from "./pages/TradePage";
+import TradePage from "./pages/TradePage/TradePage";
 import DetailedActivesTable from "./pages/AssetsPage";
 
 export function Router() {
