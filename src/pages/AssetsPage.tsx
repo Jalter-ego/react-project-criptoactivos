@@ -1,4 +1,4 @@
-import type { TickerData } from "@/services/active.service";
+import type { TickerData } from "@/services/activeServices";
 import { api } from "@/services/api";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";

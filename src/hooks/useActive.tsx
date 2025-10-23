@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import type { TickerData } from "@/services/active.service";
+import type { TickerData } from "@/services/activeServices";
 
 type ActiveContextType = {
   active: TickerData | null;
