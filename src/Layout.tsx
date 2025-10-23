@@ -1,5 +1,5 @@
 import Sidebar from "./components/Layout/Sidebar/Sidebar";
-import UserMenu from "@/components/Header/UserMenu";
+import UserMenu from "@/components/Shared/UserMenu";
 import React, { useState } from "react";
 import { IconMenu } from "./lib/icons";
 import { useLocation } from "react-router-dom";

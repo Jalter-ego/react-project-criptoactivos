@@ -1,9 +1,9 @@
-import Header from '@/components/Header/Header'
 import './HomePage.css'
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/hooks/useContext';
 import { useState } from 'react';
 import Login from '../login';
+import Header from './components/Header';
 
 export default function HomePage() {
     const navigate = useNavigate();

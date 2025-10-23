@@ -31,7 +31,6 @@ interface TransactionsHistoryProps {
 }
 
 export default function TransactionsHistory({ transactions }: TransactionsHistoryProps) {
-    console.log(transactions);
 
     return (
         <div className="mt-8">

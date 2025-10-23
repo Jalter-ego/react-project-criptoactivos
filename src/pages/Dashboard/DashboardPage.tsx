@@ -1,13 +1,13 @@
-import CardHeaders from "@/components/Dashboard/CardHeaders";
-import CardListActives from "@/components/Dashboard/CardListActives";
-import PerformanceChart from "@/components/Dashboard/PerformanceChart";
-import TransactionsHistory from "@/components/TradePage/TransactionsHistory";
+import CardHeaders from "@/pages/Dashboard/components/CardHeaders";
+import PerformanceChart from "@/pages/Dashboard/components/PerformanceChart";
+import TransactionsHistory from "@/components/Shared/TransactionsHistory";
 import { Input } from "@/components/ui/input";
 import { usePortafolio } from "@/hooks/PortafolioContext";
 import Layout from "@/Layout";
 import { transactionServices, type Transaction } from "@/services/transactionServices";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import CardListActives from "./components/CardListActives";
 
 
 

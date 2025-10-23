@@ -1,11 +1,11 @@
-import type { TickerData } from "@/services/active.service";
+import type { TickerData } from "@/services/activeServices";
 import { api } from "@/services/api";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { Input } from "../ui/input";
 import { activeIcons } from "@/lib/activeIcons";
 import { useNavigate } from "react-router-dom";
 import { useActive } from "@/hooks/useActive";
+import { Input } from "@/components/ui/input";
 
 const PRODUCT_IDS = [
     "BTC-USD", "ETH-USD", "USDT-USD", "XRP-USD", "SOL-USD",
