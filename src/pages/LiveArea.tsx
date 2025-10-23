@@ -1,5 +1,5 @@
 // src/pages/LiveAreaPage.tsx
-import TradingViewWidget from "@/components/TradePage/TradingViewWidget";
+import TradingViewWidget from "@/components/Shared/TradingViewWidget";
 import { useParams } from "react-router-dom";
 export default function LiveAreaPage() {
   const { symbol } = useParams<{ symbol: string }>();
