@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import Login from "@/pages/login";
 import { useUser } from "@/hooks/useContext";
-import UserMenu from "./UserMenu";
+import UserMenu from "@/components/Shared/UserMenu";
 
 export default function Header() {
     const { user } = useUser();
