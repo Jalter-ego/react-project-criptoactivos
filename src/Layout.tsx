@@ -1,16 +1,12 @@
 import Sidebar from "./components/Layout/Sidebar/Sidebar";
 import UserMenu from "@/components/Shared/UserMenu";
-import React, { useState } from "react";
+import { useState } from "react";
 import { IconMenu } from "./lib/icons";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Toaster } from 'sonner';
 
 
-interface LayoutProps {
-    children: React.ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -49,7 +45,7 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
                 <Toaster position="top-right"/>
                 <main className='flex-1 overflow-y-auto md:px-4 md:py-2 px-2'>
-                    {children}
+                    <Outlet />
                 </main>
             </div>
         </div>

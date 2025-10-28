@@ -9,22 +9,28 @@ import TradePage from "./pages/TradePage/TradePage";
 import DetailedActivesTable from "./pages/AssetsPage";
 import PortfolioPage from "./pages/Portafolio/PortafolioPage";
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage";
+import Layout from "./Layout";
+import AICoachPage from "./pages/AICoach/AICoachPage";
 
 export function Router() {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/live-area/:symbol" element={<LiveAreaPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/activos" element={<DetailedActivesTable />} />
-            <Route path="/portafolios" element={<PortfolioPage />} />
-            <Route path="/transacciones" element={<TransactionsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+
+            <Route element={<Layout />}>
+                <Route path="/live-area/:symbol" element={<LiveAreaPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/activos" element={<DetailedActivesTable />} />
+                <Route path="/portafolios" element={<PortfolioPage />} />
+                <Route path="/transacciones" element={<TransactionsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/trade/:id" element={<TradePage />} />
+                <Route path="/asesor-ia" element={<AICoachPage />} />
+            </Route>
 
 
             <Route path="/prueba" element={<Prueba />} />
             <Route path="/user/portafolio-config" element={<PortafolioConfig />} />
-            <Route path="/trade/:id" element={<TradePage />} />
         </Routes>
     );
 }
