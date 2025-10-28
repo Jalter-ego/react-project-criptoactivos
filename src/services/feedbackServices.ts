@@ -13,10 +13,13 @@ export interface Feedback {
 }
 
 export const feedbackServices = {
-  findRecentByPortafolio: async (portafolioId: string): Promise<Feedback[]> => {
-    console.log(portafolioId);
-    
+  findRecentByPortafolio: async (portafolioId: string): Promise<Feedback[]> => {    
     const res = await axios.get(`${API_URL}/portafolio/${portafolioId}/recent`);
+    return res.data;
+  },
+
+  findAllByPortafolio: async (portafolioId: string, page: number = 1, limit: number = 20): Promise<Feedback[]> => {
+   const res = await axios.get(`${API_URL}/portafolio/${portafolioId}?page=${page}&limit=${limit}`);
     return res.data;
   },
 };

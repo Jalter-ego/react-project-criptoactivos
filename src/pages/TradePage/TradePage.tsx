@@ -4,14 +4,16 @@ import { usePortafolio } from "@/hooks/PortafolioContext";
 import { useState, useEffect } from "react";
 import { activeIcons } from "@/lib/activeIcons";
 import { transactionServices, type CreateTransaction, type TransactionType } from "@/services/transactionServices";
-import Layout from "@/Layout";
 import TransactionsHistory from "@/components/Shared/TransactionsHistory";
 import { feedbackServices, type Feedback } from "@/services/feedbackServices";
 import { useTradeSocket } from "./hooks/useTradeSocket";
 import { useTradeData } from "./hooks/useTradeData";
-import { FeedbackModal } from "./components/FeedbackModal";
 import { ConfirmationModal } from "./components/ConfirmationModal";
 import { TransactionForm } from "./components/TransactionForm";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DollarSign, Hash, TrendingDown, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AICoachDrawer } from "./components/AICoachDrawer";
 
 export default function TradePage() {
     const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
@@ -29,18 +31,14 @@ export default function TradePage() {
     const [recentTransaction, setRecentTransaction] = useState<Partial<CreateTransaction> | null>(null);
 
     const { currentPrice } = useTradeSocket({ id: id! });
-    const { currentHolding, transactions, setTransactions} = useTradeData({ id: id! });
-
+    const { currentHolding, transactions, setTransactions } = useTradeData({ id: id! });
 
     useEffect(() => {
         if (!showFeedbackModal || !currentPortafolio?.id) return;
-
         const interval = setInterval(() => {
             fetchRecentFeedbacks();
         }, 2000);
-
         fetchRecentFeedbacks();
-
         return () => clearInterval(interval);
     }, [showFeedbackModal, currentPortafolio?.id]);
 
@@ -55,9 +53,7 @@ export default function TradePage() {
 
     if (!id || !active || !currentPortafolio) {
         return (
-            <Layout>
-                <p className="text-center text-red-500">Cargando datos o datos insuficientes...</p>
-            </Layout>
+            <p className="text-center text-red-500">Cargando datos o datos insuficientes...</p>
         );
     }
 
@@ -75,6 +71,13 @@ export default function TradePage() {
         (transactionType === "BUY" && amountUSD > availableCash) ||
         (transactionType === "SELL" && calculatedQuantity > availableAssetQuantity) ||
         isNaN(calculatedQuantity);
+
+
+    const handleOpenConfirmationModal = () => {
+        setError(null);
+        setSuccess(null);
+        setShowModal(true);
+    };
 
     const handleTransaction = async () => {
         if (isInvalid) {
@@ -113,70 +116,115 @@ export default function TradePage() {
     };
 
     return (
-        <Layout>
-            <div className="max-w-4xl mx-auto bg-card p-8 rounded-xl shadow-lg">
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold">Trading: {symbol}</h1>
-                    <img src={imageUrl} alt={symbol} className="w-20 h-20 rounded-full" />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-card2 p-4 rounded-lg text-foreground">
-                        <h2 className="text-lg font-semibold mb-2">Información del Activo</h2>
-                        <p className="text-lg">Precio actual: ${currentPrice.toFixed(2)}</p>
-                        <p>Volumen 24h: {active.volume_24_h}</p>
-                        <p className="mt-2 text-sm text-gray-500">Precio actualizado en tiempo real</p>
+        <div className="container mx-auto p-4 py-8 space-y-6">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <img src={imageUrl} alt={symbol} className="w-16 h-16 rounded-full border-2 border-primary" />
+                        <div>
+                            <CardTitle className="text-2xl">{symbol}</CardTitle>
+                            <div className="flex items-center space-x-2">
+                                <p className="text-3xl font-bold">${currentPrice.toFixed(2)}</p>
+                                {Number(active.price_percent_chg_24_h) && Number(active.price_percent_chg_24_h) > 0 ? (
+                                    <Badge className="bg-green-500">
+                                        <TrendingUp className="w-3 h-3 mr-1" /> +{active.price_percent_chg_24_h}%
+                                    </Badge>
+                                ) : (
+                                    <Badge className="bg-red-500">
+                                        <TrendingDown className="w-3 h-3 mr-1" /> {active.price_percent_chg_24_h}%
+                                    </Badge>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <div className="bg-card2 p-4 rounded-lg">
-                        <h2 className="text-lg font-semibold mb-2">Tu Portafolio</h2>
+                </CardHeader>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <DollarSign className="w-4 h-4 mr-2" />
+                            Información del Activo
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <p className="text-lg font-semibold">Precio actual: ${currentPrice.toFixed(2)}</p>
+                        <p>Volumen 24h: {active.volume_24_h}</p>
+                        <p className="text-sm text-muted-foreground">Precio actualizado en tiempo real</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center">
+                            <Hash className="w-4 h-4 mr-2" />
+                            Tu Portafolio
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
                         <p>Dinero disponible: ${availableCash.toFixed(2)}</p>
                         <p>Posees: {availableAssetQuantity.toFixed(6)} {symbol}</p>
-                    </div>
-                </div>
-
-                <TransactionForm
-                    symbol={symbol}
-                    currentPrice={currentPrice}
-                    availableCash={availableCash}
-                    availableAssetQuantity={availableAssetQuantity}
-                    transactionType={transactionType}
-                    setTransactionType={setTransactionType}
-                    amountUSD={amountUSD}
-                    setAmountUSD={setAmountUSD}
-                    calculatedQuantity={calculatedQuantity}
-                    isInvalid={isInvalid}
-                    error={error}
-                    success={success}
-                    isLoading={isLoading}
-                    onConfirm={handleTransaction}
-                    active={active}
-                />
-
-                <ConfirmationModal
-                    isOpen={showModal}
-                    onClose={() => setShowModal(false)}
-                    onConfirm={handleTransaction}
-                    isLoading={isLoading}
-                    transactionType={transactionType}
-                    symbol={symbol}
-                    amountUSD={amountUSD}
-                    calculatedQuantity={calculatedQuantity}
-                    currentPrice={currentPrice}
-                />
-                <FeedbackModal
-                    isOpen={showFeedbackModal}
-                    onClose={() => setShowFeedbackModal(false)}
-                    transactionType={transactionType}
-                    symbol={symbol}
-                    recentTransaction={recentTransaction}
-                    feedbacks={feedbacks}
-                />
-                <h2 className="text-lg font-semibold">Historial de Transacciones</h2>
-                <TransactionsHistory
-                    transactions={transactions}
-                />
-
+                        <Badge className="mt-2">Saldo total: ${(availableCash + (availableAssetQuantity * currentPrice)).toFixed(2)}</Badge>
+                    </CardContent>
+                </Card>
             </div>
-        </Layout>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Realizar Transacción</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <TransactionForm
+                        symbol={symbol}
+                        currentPrice={currentPrice}
+                        availableCash={availableCash}
+                        availableAssetQuantity={availableAssetQuantity}
+                        transactionType={transactionType}
+                        setTransactionType={setTransactionType}
+                        amountUSD={amountUSD}
+                        setAmountUSD={setAmountUSD}
+                        calculatedQuantity={calculatedQuantity}
+                        isInvalid={isInvalid}
+                        error={error}
+                        success={success}
+                        isLoading={isLoading}
+                        onConfirm={handleOpenConfirmationModal}
+                        active={active}
+                    />
+                </CardContent>
+            </Card>
+
+            <ConfirmationModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onConfirm={handleTransaction}
+                isLoading={isLoading}
+                transactionType={transactionType}
+                symbol={symbol}
+                amountUSD={amountUSD}
+                calculatedQuantity={calculatedQuantity}
+                currentPrice={currentPrice}
+            />
+            <AICoachDrawer
+                isOpen={showFeedbackModal}
+                onClose={() => setShowFeedbackModal(false)}
+                transactionType={transactionType}
+                symbol={symbol}
+                recentTransaction={recentTransaction}
+                feedbacks={feedbacks}
+            />
+            <Card>
+                <CardHeader>
+                    <CardTitle>Historial de Transacciones</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <TransactionsHistory
+                        transactions={transactions}
+                    />
+                </CardContent>
+            </Card>
+
+        </div>
     );
 }

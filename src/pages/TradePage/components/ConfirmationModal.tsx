@@ -1,4 +1,6 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -26,27 +28,50 @@ export const ConfirmationModal = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-40 bg-black/20 bg-opacity-50 flex items-center justify-center">
-            <div className="bg-card p-6 rounded-lg shadow-lg max-w-sm w-full">
-                <h2 className="text-xl font-bold mb-4">Confirmar Transacción</h2>
-                <p>Tipo: {transactionType}</p>
-                <p>Activo: {symbol}</p>
-                <p>Monto: ${amountUSD.toFixed(2)}</p>
-                <p>Cantidad: {calculatedQuantity.toFixed(6)} {symbol}</p>
-                <p>Precio por unidad: ${currentPrice.toFixed(2)}</p>
-                <div className="flex gap-4 mt-6">
-                    <Button onClick={onClose} className="flex-1 bg-gray-600 text-white py-2 rounded-md">
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center justify-center">
+                        <Badge variant={transactionType === "BUY" ? "default" : "destructive"} className="mr-2">
+                            {transactionType}
+                        </Badge>
+                        Confirmar Transacción
+                    </DialogTitle>
+                    <DialogDescription>
+                        Revisa los detalles antes de confirmar.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                        <span>Activo:</span>
+                        <span className="font-medium">{symbol}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Monto (USD):</span>
+                        <span className="font-medium">${amountUSD.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Cantidad:</span>
+                        <span className="font-medium">{calculatedQuantity.toFixed(6)} {symbol}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Precio por unidad:</span>
+                        <span className="font-medium">${currentPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t">
+                        <span className="font-semibold">Total:</span>
+                        <span className="font-bold text-primary">${(amountUSD).toFixed(2)}</span>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose} disabled={isLoading}>
                         Cancelar
                     </Button>
-                    <Button
-                        onClick={onConfirm}
-                        disabled={isLoading}
-                        className="flex-1 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-                    >
-                        {isLoading ? "Procesando..." : "Confirmar"}
+                    <Button onClick={onConfirm} disabled={isLoading}>
+                        {isLoading ? "Procesando..." : "Confirmar Transacción"}
                     </Button>
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };

@@ -6,6 +6,7 @@ import { activeIcons } from "@/lib/activeIcons";
 import { useNavigate } from "react-router-dom";
 import { useActive } from "@/hooks/useActive";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const PRODUCT_IDS = [
     "BTC-USD", "ETH-USD", "USDT-USD", "XRP-USD", "SOL-USD",
@@ -94,15 +95,20 @@ export default function CardListActives() {
                 <tbody>
                     {filteredTickers.map((ticker) => (
                         <tr key={ticker.product_id}
-                            className="border-b"
-                            onClick={() => handleClick(ticker)}>
+                            className="border-b">
                             <td className="px-2 py-2 flex items-center gap-2">
+                                <Button className="bg-blue-500 px-3 rounded-2xl hover:bg-blue-400 transition-colors duration-300
+                                    cursor-pointer"
+                                    onClick={() => handleClick(ticker)}>
+                                    Buy
+                                </Button>
                                 <img
                                     src={activeIcons[ticker.product_id]}
                                     alt={ticker.product_id}
                                     className="w-5 h-5 rounded-full"
                                 />
                                 {ticker.product_id}
+
                             </td>
                             <td className="px-2 py-2 text-right">
                                 {ticker.price !== "---"
