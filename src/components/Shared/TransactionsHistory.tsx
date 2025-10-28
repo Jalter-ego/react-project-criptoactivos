@@ -1,29 +1,18 @@
 import { activeIcons } from "@/lib/activeIcons";
-import type { Transaction } from "@/services/transactionServices"
+import type { Transaction, TransactionType } from "@/services/transactionServices"
+import { ArrowDownRight, ArrowUpRight, Clock } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { format, parseISO } from "date-fns";
 
-function timeAgo(date: Date): string {
-    const now = new Date();
-    const diff = (date.getTime() - now.getTime()) / 1000;
-    const rtf = new Intl.RelativeTimeFormat("es", { numeric: "auto" });
-
-    const divisions: { amount: number; name: Intl.RelativeTimeFormatUnit }[] = [
-        { amount: 60, name: "second" },
-        { amount: 60, name: "minute" },
-        { amount: 24, name: "hour" },
-        { amount: 7, name: "day" },
-        { amount: 4.34524, name: "week" },
-        { amount: 12, name: "month" },
-        { amount: Number.POSITIVE_INFINITY, name: "year" },
-    ];
-
-    let duration = diff;
-    for (let i = 0; i < divisions.length; i++) {
-        if (Math.abs(duration) < divisions[i].amount) {
-            return rtf.format(Math.round(duration), divisions[i].name);
-        }
-        duration /= divisions[i].amount;
+function formatDate(dateString: string | undefined): string {
+    if (!dateString) return "N/A";
+    try {
+        return format(parseISO(dateString), "dd/MM/yyyy HH:mm");
+    } catch {
+        return "N/A";
     }
-    return "";
 }
 
 interface TransactionsHistoryProps {
@@ -31,54 +20,93 @@ interface TransactionsHistoryProps {
 }
 
 export default function TransactionsHistory({ transactions }: TransactionsHistoryProps) {
+    const sortedTransactions = [...transactions].sort((a, b) => 
+        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    );
+
+    const getTypeBadge = (type: TransactionType) => {
+        const variant = type === "BUY" ? "default" : "destructive";
+        const icon = type === "BUY" ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />;
+        return (
+            <Badge variant={variant} className={type === "BUY" ? "bg-green-500 text-green-50" : "bg-red-500 text-red-50"}>
+                {icon} {type}
+            </Badge>
+        );
+    };
+
+    const getTotalValue = (tx: Transaction) => {
+        return (tx.amount * tx.price).toFixed(2);
+    };
+
+    if (sortedTransactions.length === 0) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center">
+                        <Clock className="w-4 h-4 mr-2" />
+                        Historial de Transacciones
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center py-8">
+                    <p className="text-muted-foreground">No hay transacciones recientes en este activo.</p>
+                    <p className="text-sm text-muted-foreground mt-1">¡Realiza tu primera compra o venta!</p>
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
-        <div className="mt-8">
-            {transactions.length > 0 ? (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Historial de Transacciones ({sortedTransactions.length})
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-card2 rounded-2xl">
-                        <thead>
-                            <tr>
-                                <th className="py-2 px-4 border-b">Tipo</th>
-                                <th className="py-2 px-4 border-b">Moneda</th>
-                                <th className="py-2 px-4 border-b">Cantidad</th>
-                                <th className="py-2 px-4 border-b">Precio</th>
-                                <th className="py-2 px-4 border-b">Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {transactions.map((tx) => (
-                                <tr key={tx.id}>
-                                    <td
-                                        className={`py-2 px-4 border-b text-center font-semibold
-                                            ${tx.type === "BUY" ? "text-green-500" : "text-red-500"}`}
-                                    >
-                                        {tx.type}
-                                    </td>
-
-                                    <td className="py-2 px-4 border-b flex items-center justify-center gap-1">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Tipo</TableHead>
+                                <TableHead>Activo</TableHead>
+                                <TableHead>Cantidad</TableHead>
+                                <TableHead>Precio (USD)</TableHead>
+                                <TableHead>Valor Total (USD)</TableHead>
+                                <TableHead>Fecha</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {sortedTransactions.map((tx) => (
+                                <TableRow key={tx.id}>
+                                    <TableCell className="font-medium">{getTypeBadge(tx.type)}</TableCell>
+                                    <TableCell className="flex items-center gap-2">
                                         <img
-                                            src={activeIcons[tx.activeSymbol]}
+                                            src={activeIcons[tx.activeSymbol] || "https://via.placeholder.com/24"}
                                             alt={tx.activeSymbol}
                                             className="w-5 h-5 rounded-full"
                                         />
-                                        <p className="text-sm">
-                                            {tx.activeSymbol}
-                                        </p>
-                                    </td>
-                                    <td className="py-2 px-4 border-b text-center">{tx.amount.toFixed(6)}</td>
-                                    <td className="py-2 px-4 border-b text-center">${tx.price.toFixed(2)}</td>
-                                    <td className="py-2 px-4 border-b text-center">
-                                        {tx.createdAt ? timeAgo(new Date(tx.createdAt)) : "-"}
-                                    </td>                                
-                                </tr>
+                                        <span>{tx.activeSymbol}</span>
+                                    </TableCell>
+                                    <TableCell className="">{tx.amount.toFixed(6)}</TableCell>
+                                    <TableCell className="">${tx.price.toFixed(2)}</TableCell>
+                                    <TableCell className="font-medium">
+                                        ${getTotalValue(tx)}
+                                        {tx.type === "BUY" ? (
+                                            <span className="text-green-600 text-xs ml-1">+Compra</span>
+                                        ) : (
+                                            <span className="text-red-600 text-xs ml-1">-Venta</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-sm text-muted-foreground">
+                                        {formatDate(tx.createdAt)}
+                                    </TableCell>
+                                </TableRow>
                             ))}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 </div>
-            ) : (
-                <p>No hay transacciones recientes.</p>
-            )}
-        </div>
-    )
+            </CardContent>
+        </Card>
+    );
 }
