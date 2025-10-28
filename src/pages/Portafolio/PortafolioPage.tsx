@@ -1,4 +1,3 @@
-// src/pages/Portfolio/PortfolioPage.tsx
 import { useState, useEffect } from "react";
 import { usePortafolio } from "@/hooks/PortafolioContext";
 import { portafolioServices, type PortafolioWithHoldings, type CreatePortafolio, type UpdatePortafolio, type Holding } from "@/services/portafolioServices";
@@ -9,14 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit3, Plus } from "lucide-react";
-import Layout from "@/Layout";
 import { useUser } from "@/hooks/useContext";
 import { toast } from "sonner";
 import PerformanceChart from "../Dashboard/components/PerformanceChart";
+import SpinnerComponent from "@/components/Shared/Spinner";
 
 export default function PortfolioPage() {
   const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
-  const { user } = useUser(); // Asume hook que devuelve { id: string }
+  const { user } = useUser();
   const [portfolios, setPortfolios] = useState<PortafolioWithHoldings[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPortfolio, setEditingPortfolio] = useState<PortafolioWithHoldings | null>(null);
@@ -58,11 +57,11 @@ export default function PortfolioPage() {
         userId: user.id,
       };
       const created = await portafolioServices.create(data);
-      setPortfolios([...portfolios, { ...created, holdings: [] }]); 
+      setPortfolios([...portfolios, { ...created, holdings: [] }]);
       setNewPortfolioName("");
       setNewPortfolioCash(0);
       setShowAddDialog(false);
-      toast.success( "Portafolio creado." );
+      toast.success("Portafolio creado.");
     } catch (err) {
       toast.error("No se pudo crear el portafolio.");
     }
@@ -101,7 +100,7 @@ export default function PortfolioPage() {
       setPortfolios(portfolios.filter(p => p.id !== deletingId));
       setDeletingId(null);
       setShowDeleteDialog(false);
-      toast.success("Portafolio eliminado." );
+      toast.success("Portafolio eliminado.");
     } catch (err) {
       toast.error("No se pudo eliminar el portafolio.");
     }
@@ -118,157 +117,151 @@ export default function PortfolioPage() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="flex justify-center items-center h-64">
-          <p>Cargando portafolios...</p>
-        </div>
-      </Layout>
-    );
+      <SpinnerComponent />
+    )
   }
 
   return (
-    <Layout>
-      <div className="container mx-auto p-6 space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Mis Portafolios</h1>
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" /> Agregar Portafolio
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Crear Nuevo Portafolio</DialogTitle>
-                <DialogDescription>
-                  Ingresa el nombre y saldo inicial en USD.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input
-                    id="name"
-                    value={newPortfolioName}
-                    onChange={(e) => setNewPortfolioName(e.target.value)}
-                    placeholder="Ej. Portafolio Crecimiento"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="cash">Saldo Inicial (USD)</Label>
-                  <Input
-                    id="cash"
-                    type="number"
-                    value={newPortfolioCash}
-                    onChange={(e) => setNewPortfolioCash(parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
-                  />
-                </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Mis Portafolios</h1>
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" /> Agregar Portafolio
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Crear Nuevo Portafolio</DialogTitle>
+              <DialogDescription>
+                Ingresa el nombre y saldo inicial en USD.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">Nombre</Label>
+                <Input
+                  id="name"
+                  value={newPortfolioName}
+                  onChange={(e) => setNewPortfolioName(e.target.value)}
+                  placeholder="Ej. Portafolio Crecimiento"
+                />
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancelar</Button>
-                <Button onClick={handleCreate}>Crear</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {portfolios.map((portfolio) => {
-            const totalHoldings = portfolio.holdings.length;
-            const holdingsValue = getTotalHoldingsValue(portfolio.holdings);
-            const isCurrent = currentPortafolio?.id === portfolio.id;
-
-            return (
-              <Card key={portfolio.id} className={isCurrent ? "ring-2 ring-primary" : ""}>
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-start">
-                    {portfolio.name}
-                    {isCurrent && <Badge variant="secondary">Activo</Badge>}
-                  </CardTitle>
-                  <CardDescription>
-                    {totalHoldings} activos • Valor holdings: ${holdingsValue.toFixed(2)}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-2xl font-bold">${portfolio.cash.toFixed(2)}</div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={isCurrent ? "secondary" : "default"}
-                      size="sm"
-                      onClick={() => handleSelect(portfolio)}
-                      className="flex-1"
-                    >
-                      {isCurrent ? "Usando" : "Seleccionar"}
-                    </Button>
-                    <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Edit3 className="w-4 h-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Editar {portfolio.name}</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="edit-name">Nombre</Label>
-                            <Input
-                              id="edit-name"
-                              value={editingName || portfolio.name}
-                              onChange={(e) => setEditingName(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="edit-cash">Saldo (USD)</Label>
-                            <Input
-                              id="edit-cash"
-                              type="number"
-                              value={editingCash || portfolio.cash}
-                              onChange={(e) => setEditingCash(parseFloat(e.target.value) || 0)}
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={() => { setShowEditDialog(false); setEditingPortfolio(null); }}>Cancelar</Button>
-                          <Button onClick={handleUpdate}>Actualizar</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                      <DialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Eliminar Portafolio</DialogTitle>
-                          <DialogDescription>
-                            ¿Estás seguro? Esto eliminará el portafolio "{portfolio.name}" y todas sus transacciones.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancelar</Button>
-                          <Button variant="destructive" onClick={handleDelete}>Eliminar</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {currentPortafolio && (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Rendimiento del Portafolio Actual</h2>
-            <PerformanceChart portafolioId={currentPortafolio.id} />
-          </div>
-        )}
+              <div>
+                <Label htmlFor="cash">Saldo Inicial (USD)</Label>
+                <Input
+                  id="cash"
+                  type="number"
+                  value={newPortfolioCash}
+                  onChange={(e) => setNewPortfolioCash(parseFloat(e.target.value) || 0)}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancelar</Button>
+              <Button onClick={handleCreate}>Crear</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-    </Layout>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {portfolios.map((portfolio) => {
+          const totalHoldings = portfolio.holdings.length;
+          const holdingsValue = getTotalHoldingsValue(portfolio.holdings);
+          const isCurrent = currentPortafolio?.id === portfolio.id;
+
+          return (
+            <Card key={portfolio.id} className={isCurrent ? "ring-2 ring-primary" : ""}>
+              <CardHeader>
+                <CardTitle className="flex justify-between items-start">
+                  {portfolio.name}
+                  {isCurrent && <Badge variant="secondary">Activo</Badge>}
+                </CardTitle>
+                <CardDescription>
+                  {totalHoldings} activos • Valor holdings: ${holdingsValue.toFixed(2)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-2xl font-bold">${portfolio.cash.toFixed(2)}</div>
+                <div className="flex gap-2">
+                  <Button
+                    variant={isCurrent ? "secondary" : "default"}
+                    size="sm"
+                    onClick={() => handleSelect(portfolio)}
+                    className="flex-1"
+                  >
+                    {isCurrent ? "Usando" : "Seleccionar"}
+                  </Button>
+                  <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Editar {portfolio.name}</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="edit-name">Nombre</Label>
+                          <Input
+                            id="edit-name"
+                            value={editingName || portfolio.name}
+                            onChange={(e) => setEditingName(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-cash">Saldo (USD)</Label>
+                          <Input
+                            id="edit-cash"
+                            type="number"
+                            value={editingCash || portfolio.cash}
+                            onChange={(e) => setEditingCash(parseFloat(e.target.value) || 0)}
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => { setShowEditDialog(false); setEditingPortfolio(null); }}>Cancelar</Button>
+                        <Button onClick={handleUpdate}>Actualizar</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Eliminar Portafolio</DialogTitle>
+                        <DialogDescription>
+                          ¿Estás seguro? Esto eliminará el portafolio "{portfolio.name}" y todas sus transacciones.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancelar</Button>
+                        <Button variant="destructive" onClick={handleDelete}>Eliminar</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {currentPortafolio && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Rendimiento del Portafolio Actual</h2>
+          <PerformanceChart portafolioId={currentPortafolio.id} />
+        </div>
+      )}
+    </div>
   );
 }
