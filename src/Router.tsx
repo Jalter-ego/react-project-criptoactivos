@@ -7,6 +7,8 @@ import Prueba from "./pages/prueba";
 import PortafolioConfig from "./pages/User/portafolioConfig";
 import TradePage from "./pages/TradePage/TradePage";
 import DetailedActivesTable from "./pages/AssetsPage";
+import PortfolioPage from "./pages/Portafolio/PortafolioPage";
+import TransactionsPage from "./pages/TransactionsPage/TransactionsPage";
 
 export function Router() {
     return (
@@ -15,7 +17,11 @@ export function Router() {
             <Route path="/live-area/:symbol" element={<LiveAreaPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/activos" element={<DetailedActivesTable />} />
+            <Route path="/portafolios" element={<PortfolioPage />} />
+            <Route path="/transacciones" element={<TransactionsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+
+
             <Route path="/prueba" element={<Prueba />} />
             <Route path="/user/portafolio-config" element={<PortafolioConfig />} />
             <Route path="/trade/:id" element={<TradePage />} />
