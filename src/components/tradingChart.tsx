@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import Chart from 'chart.js/auto';
+import { api } from '@/services/api';
 
 interface Trade {
   price: string;
@@ -15,10 +16,10 @@ const TradingChart: React.FC = () => {
   const chartInstance = React.useRef<Chart | null>(null);
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:3000'); // URL de tu backend NestJS
+    socketRef.current = io(api); 
 
     socketRef.current.on('trade', (trade: Trade) => {
-      setTrades(prev => [...prev.slice(-50), trade]); // Guardamos solo los últimos 50 trades
+      setTrades(prev => [...prev.slice(-50), trade]); 
     });
 
     return () => {

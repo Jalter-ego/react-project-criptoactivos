@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from "recharts";
+import { api } from "@/services/api";
 
 type Trade = {
   price: number;
@@ -13,7 +14,7 @@ export default function LiveAreaChart() {
   const [data, setData] = useState<Trade[]>([]);
 
   useEffect(() => {
-    const socket = io("http://localhost:3000");
+    const socket = io(api);
 
     socket.on("trade", (trade: Trade) => {
       setData((prev) => {
