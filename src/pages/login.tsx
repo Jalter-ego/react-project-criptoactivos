@@ -3,7 +3,6 @@ import { GoogleLogin } from "@react-oauth/google";
 import React, { useState } from "react";
 
 import { login, googleLogin, register } from "../services/auth";
-import loginImg from "../assets/login.png";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useContext";
 import { useNavigate } from "react-router-dom";
@@ -54,7 +53,7 @@ const Login: React.FC = () => {
     <div className="flex justify-between w-full h-full bg-background p-8 lg:p-2">
       <div className="w-[50%] flex justify-center">
         <img
-          src={loginImg}
+          src='/src/assets/Login.png'
           alt="Logo"
           className="w-full h-auto rounded-3xl"
         />
