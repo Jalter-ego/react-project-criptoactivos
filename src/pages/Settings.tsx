@@ -1,10 +1,9 @@
-import Layout from "@/Layout";
 
-export default function SettingsPage(){
+export default function SettingsPage() {
     return (
-        <Layout>
+        <div>
             hola
-        </Layout>
-        
+        </div>
+
     )
 }

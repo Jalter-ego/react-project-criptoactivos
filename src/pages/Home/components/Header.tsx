@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import Login from "@/pages/login";
 import { useUser } from "@/hooks/useContext";
-import UserMenu from "./UserMenu";
+import UserMenu from "@/components/Shared/UserMenu";
 
 export default function Header() {
     const { user } = useUser();
@@ -14,6 +14,17 @@ export default function Header() {
             <header className="w-full h-16 flex items-center justify-between px-4">
                 <div>
                     <h1 className="text-2xl font-medium">TradingView</h1>
+                </div>
+                <div className="flex gap-x-6 text-md font-semibold">
+                    <p>
+                        Productos
+                    </p>
+                    <p>
+                        Comunidad
+                    </p>
+                    <p>
+                        Más
+                    </p>
                 </div>
                 <div>
                     <UserMenu
