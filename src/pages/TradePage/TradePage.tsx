@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Hash, TrendingDown, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AICoachDrawer } from "./components/AICoachDrawer";
+import SpinnerComponent from "@/components/Shared/Spinner";
 
 export default function TradePage() {
     const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
@@ -53,7 +54,7 @@ export default function TradePage() {
 
     if (!id || !active || !currentPortafolio) {
         return (
-            <p className="text-center text-red-500">Cargando datos o datos insuficientes...</p>
+            <SpinnerComponent/>
         );
     }
 

@@ -147,7 +147,7 @@ export const AICoachDrawer = ({
                         <div className="text-center py-8">
                             <p className="text-muted-foreground">¡Excelente decisión! No se detectaron issues.</p>
                             <p className="text-sm text-muted-foreground mt-2">Sigue así – tu score de IA es sólido.</p>
-                            <Button variant="outline" onClick={() => navigate("/ai-coach")} className="mt-4">
+                            <Button variant="outline" onClick={() => navigate("/asesor-ia")} className="mt-4">
                                 Ver Coach IA
                             </Button>
                         </div>
@@ -157,7 +157,7 @@ export const AICoachDrawer = ({
                         <Button onClick={onClose} className="flex-1" variant="outline">
                             Cerrar
                         </Button>
-                        <Button onClick={() => navigate("/ai-coach")} className="flex-1">
+                        <Button onClick={() => navigate("/asesor-ia")} className="flex-1">
                             Abrir Coach IA
                         </Button>
                     </div>
