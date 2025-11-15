@@ -31,7 +31,7 @@ export const getFeedbackColor = (type: string): string => {
     case "BEHAVIORAL_NUDGE":
       return "text-yellow-600 bg-yellow-50 border-yellow-200";
     case "COST_ANALYSIS":
-      return "text-gray-600 bg-gray-50 border-gray-200";
+      return "text-green-600 bg-green-50 border-green-200";
     default:
       return "text-gray-600 bg-gray-50 border-gray-200";
   }

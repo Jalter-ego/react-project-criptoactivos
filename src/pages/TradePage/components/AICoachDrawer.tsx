@@ -72,14 +72,14 @@ export const AICoachDrawer = ({
                 <div className="p-4 space-y-4">
                     {hasFeedbacks ? (
                         <Tabs defaultValue="resumen" className="w-full">
-                            <TabsList className="grid w-full grid-cols-3">
+                            <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="resumen">Resumen</TabsTrigger>
                                 <TabsTrigger value="riesgos" disabled={riskFeedbacks.length === 0}>Riesgos ({riskFeedbacks.length})</TabsTrigger>
                                 <TabsTrigger value="comportamiento" disabled={behaviorFeedbacks.length === 0}>Comportamiento ({behaviorFeedbacks.length})</TabsTrigger>
                                 <TabsTrigger value="costos" disabled={costFeedbacks.length === 0}>Costos ({costFeedbacks.length})</TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="resumen" className="space-y-4">
+                            <TabsContent value="resumen" className="space-y-8">
                                 <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                                     <p className="text-green-700 font-medium">¡Transacción confirmada exitosamente!</p>
                                     <p className="text-sm text-green-600 mt-1">Revisa los insights abajo para mejorar tu estrategia.</p>
