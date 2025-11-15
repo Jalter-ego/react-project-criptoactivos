@@ -28,7 +28,6 @@ const PortafolioConfig: React.FC = () => {
 	const [newPortfolioName, setNewPortfolioName] = useState("");
 	const [newPortfolioCash, setNewPortfolioCash] = useState(0);
 	const [editingName, setEditingName] = useState("");
-	const [editingCash, setEditingCash] = useState(0);
 
 	useEffect(() => {
 		if (user?.id) {
@@ -72,7 +71,6 @@ const PortafolioConfig: React.FC = () => {
 	const handleEdit = (portfolio: PortafolioWithHoldings) => {
 		setEditingPortfolio(portfolio);
 		setEditingName(portfolio.name);
-		setEditingCash(portfolio.cash);
 		setShowEditDialog(true);
 	};
 
@@ -81,14 +79,12 @@ const PortafolioConfig: React.FC = () => {
 		try {
 			const data: UpdatePortafolio = {
 				name: editingName,
-				cash: editingCash,
 			};
 			await portafolioServices.update(editingPortfolio.id, data);
-			setPortfolios(portfolios.map(p => p.id === editingPortfolio.id ? { ...p, name: editingName, cash: editingCash } : p));
+			setPortfolios(portfolios.map(p => p.id === editingPortfolio.id ? { ...p, name: editingName } : p));
 			setShowEditDialog(false);
 			setEditingPortfolio(null);
 			setEditingName("");
-			setEditingCash(0);
 			toast.success("Portafolio actualizado.");
 		} catch (err) {
 			toast.error("Error al actualizar portafolio");
@@ -241,7 +237,7 @@ const PortafolioConfig: React.FC = () => {
 				</div>
 
 				<Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-					<DialogContent>
+					<DialogContent className="bg-background/80">
 						<DialogHeader>
 							<DialogTitle>Editar Portafolio</DialogTitle>
 						</DialogHeader>
@@ -252,15 +248,6 @@ const PortafolioConfig: React.FC = () => {
 									id="edit-name"
 									value={editingName}
 									onChange={(e) => setEditingName(e.target.value)}
-								/>
-							</div>
-							<div>
-								<Label htmlFor="edit-cash">Saldo (USD)</Label>
-								<Input
-									id="edit-cash"
-									type="number"
-									value={editingCash}
-									onChange={(e) => setEditingCash(parseFloat(e.target.value) || 0)}
 								/>
 							</div>
 						</div>

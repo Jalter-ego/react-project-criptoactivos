@@ -34,8 +34,6 @@ export interface CreatePortafolio {
 
 export interface UpdatePortafolio {
   name?: string;
-  cash?: number;
-  userId?: string;
 }
 
 export interface PortafolioSnapshot {
