@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useActive } from "@/hooks/useActive";
 import { usePortafolio } from "@/hooks/PortafolioContext";
 import { useState, useEffect } from "react";
@@ -11,15 +11,21 @@ import { useTradeData } from "./hooks/useTradeData";
 import { ConfirmationModal } from "./components/ConfirmationModal";
 import { TransactionForm } from "./components/TransactionForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Hash, TrendingDown, TrendingUp } from "lucide-react";
+import { AlertTriangle, DollarSign, Hash, TrendingDown, TrendingUp, TrendingUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AICoachDrawer } from "./components/AICoachDrawer";
 import SpinnerComponent from "@/components/Shared/Spinner";
+import { aiServices, type Recommendation } from "@/services/aiServices";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function TradePage() {
     const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
     const { id } = useParams<{ id: string }>();
     const { active } = useActive();
+    const navigate = useNavigate()
 
     const [amountUSD, setAmountUSD] = useState<number>(0);
     const [transactionType, setTransactionType] = useState<TransactionType>("BUY");
@@ -30,6 +36,10 @@ export default function TradePage() {
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [recentTransaction, setRecentTransaction] = useState<Partial<CreateTransaction> | null>(null);
+
+    const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
+    const [recLoading, setRecLoading] = useState(true);
+    const [showRecModal, setShowRecModal] = useState(false);
 
     const { currentPrice } = useTradeSocket({ id: id! });
     const { currentHolding, transactions, setTransactions } = useTradeData({ id: id! });
@@ -42,6 +52,26 @@ export default function TradePage() {
         fetchRecentFeedbacks();
         return () => clearInterval(interval);
     }, [showFeedbackModal, currentPortafolio?.id]);
+
+    useEffect(() => {
+        if (!id || !currentPortafolio?.id) return;
+        const fetchRecommendation = async () => {
+            try {
+                setRecLoading(true);
+                const rec = await aiServices.getRecommendation(currentPortafolio.id, id);
+                setRecommendation(rec);
+                if (rec.recommendation === "BUY") {
+                    setTransactionType("BUY");
+                }
+            } catch (err) {
+                console.error("Error fetching recommendation:", err);
+                toast.error("No disponible recomendación IA");
+            } finally {
+                setRecLoading(false);
+            }
+        };
+        fetchRecommendation();
+    }, [id, currentPortafolio?.id]);
 
     const fetchRecentFeedbacks = async () => {
         try {
@@ -116,30 +146,75 @@ export default function TradePage() {
         }
     };
 
+    const getRecColor = (type: string) => {
+        switch (type) {
+            case "BUY": return "bg-green-500 text-green-50";
+            case "SELL": return "bg-red-500 text-red-50";
+            case "HOLD": return "bg-orange-500 text-orange-50";
+            default: return "bg-gray-500 text-gray-50";
+        }
+    };
+
+    const getRecIcon = (type: string) => {
+        switch (type) {
+            case "BUY": return <TrendingUp className="w-4 h-4 mr-1" />;
+            case "SELL": return <TrendingDown className="w-4 h-4 mr-1" />;
+            case "HOLD": return <TrendingUpDown className="w-4 h-4 mr-1" />;
+            default: return <AlertTriangle className="w-4 h-4 mr-1" />;
+        }
+    };
+
     return (
         <div className="container mx-auto p-4 py-8 space-y-6">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <img src={imageUrl} alt={symbol} className="w-16 h-16 rounded-full border-2 border-primary" />
-                        <div>
-                            <CardTitle className="text-2xl">{symbol}</CardTitle>
-                            <div className="flex items-center space-x-2">
-                                <p className="text-3xl font-bold">${currentPrice.toFixed(2)}</p>
-                                {Number(active.price_percent_chg_24_h) && Number(active.price_percent_chg_24_h) > 0 ? (
-                                    <Badge className="bg-green-500">
-                                        <TrendingUp className="w-3 h-3 mr-1" /> +{active.price_percent_chg_24_h}%
-                                    </Badge>
-                                ) : (
-                                    <Badge className="bg-red-500">
-                                        <TrendingDown className="w-3 h-3 mr-1" /> {active.price_percent_chg_24_h}%
-                                    </Badge>
-                                )}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <img src={imageUrl} alt={symbol} className="w-16 h-16 rounded-full border-2 border-primary" />
+                            <div>
+                                <CardTitle className="text-2xl">{symbol}</CardTitle>
+                                <div className="flex items-center space-x-2">
+                                    <p className="text-3xl font-bold">${currentPrice.toFixed(2)}</p>
+                                    {Number(active.price_percent_chg_24_h) && Number(active.price_percent_chg_24_h) > 0 ? (
+                                        <Badge className="bg-green-500">
+                                            <TrendingUp className="w-3 h-3 mr-1" /> +{active.price_percent_chg_24_h}%
+                                        </Badge>
+                                    ) : (
+                                        <Badge className="bg-red-500">
+                                            <TrendingDown className="w-3 h-3 mr-1" /> {active.price_percent_chg_24_h}%
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </CardHeader>
-            </Card>
+                    </CardHeader>
+                </Card>
+                            <Card className="border-primary/20">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center text-primary">
+                            <TrendingUpDown className="w-5 h-5 mr-2" />
+                            Sugerencia IA: {recommendation ? recommendation.recommendation : "Cargando..."}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                        {recLoading ? (
+                            <SpinnerComponent size="32"/>
+                        ) : recommendation ? (
+                            <div className="flex items-center justify-between">
+                                <Badge className={`${getRecColor(recommendation.recommendation)} text-sm px-3 py-1`}>
+                                    {getRecIcon(recommendation.recommendation)} {recommendation.recommendation}
+                                    {recommendation.confidence && ` (${(recommendation.confidence * 100).toFixed(0)}% conf.)`}
+                                </Badge>
+                                <Button variant="outline" size="sm" onClick={() => setShowRecModal(true)}>
+                                    ¿Por qué?
+                                </Button>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No disponible – prueba de nuevo.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
@@ -225,6 +300,31 @@ export default function TradePage() {
                     />
                 </CardContent>
             </Card>
+
+            <Dialog open={showRecModal} onOpenChange={setShowRecModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Sugerencia IA: {recommendation?.recommendation}</DialogTitle>
+                        <DialogDescription>
+                            Basado en modelo ML entrenado con 5 años de datos históricos para {symbol}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 text-sm">
+                        <Alert>
+                            <AlertTitle>Razón: {recommendation?.reason || "Estrategia detectada (ej. buy the dip)"}</AlertTitle>
+                            <AlertDescription>
+                                Confianza: {(recommendation?.confidence || 0) * 100}% <br />
+                                Estrategia sugerida: {recommendation?.recommendation === "BUY" ? "Buy the dip" : recommendation?.recommendation === "SELL" ? "Take profits" : "Mantén posición"}.
+                            </AlertDescription>
+                        </Alert>
+                        <p className="text-xs text-muted-foreground">Modelos para BTC, ETH, SOL. Actualizado con data real-time.</p>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={() => setShowRecModal(false)}>Cerrar</Button>
+                        <Button onClick={() => navigate("/ai-coach")} variant="outline">Ver más en Coach IA</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
         </div>
     );
