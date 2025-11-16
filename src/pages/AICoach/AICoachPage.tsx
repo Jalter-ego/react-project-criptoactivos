@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Brain, Shield, TrendingUp } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { toast } from "sonner";
 import SpinnerComponent from "@/components/Shared/Spinner";
 import { getFeedbackColor } from "../TradePage/utils/tradeUtils";
@@ -55,6 +55,22 @@ export default function AICoachPage() {
 
     const concentrationData = insights?.concentrationData || [];
     const costsData = insights?.costsData || [];
+    const isWeeklyData = costsData.length > 0 && costsData[0]?.periodType === 'week';
+    console.log(concentrationData);
+    console.log(costsData);
+    console.log(isWeeklyData);
+    
+    
+    
+
+    const formatPeriodLabel = (period: string, isWeekly: boolean) => {
+        if (isWeekly) {
+            return period.replace('W', 'Sem ');
+        }
+        return period;
+    };
+
+
 
     const behaviorScore = Math.round(100 - (behaviorFeedbacks.length / feedbacks.length) * 100); // Mock score
 
@@ -63,6 +79,10 @@ export default function AICoachPage() {
             <SpinnerComponent />
         );
     }
+
+    const renderCustomLabel = (entry: any) => {
+        return `${entry.name}: ${entry.value.toFixed(1)}%`;
+    };
 
     return (
         <div className="container mx-auto p-6 space-y-6">
@@ -118,23 +138,44 @@ export default function AICoachPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Riesgos Activos</CardTitle>
-                            <CardDescription>Monitoreo de concentración y apalancamiento.</CardDescription>
+                            <CardDescription>Monitoreo de concentración y apalancamiento. Cada porción muestra el activo y su % del total.</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <PieChart>
-                                    <Pie
-                                        data={concentrationData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label
-                                    >
-                                        {concentrationData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${entry.name}`}
-                                                fill={COLORS[index % COLORS.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-                                </PieChart>
-                            </ResponsiveContainer>
+                        <CardContent className="space-y-6">
+                            <div className="flex justify-center">
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <PieChart>
+                                        <Pie
+                                            data={concentrationData}
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={80}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            label={renderCustomLabel}
+                                        >
+                                            {concentrationData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${entry.name}`}
+                                                    fill={COLORS[index % COLORS.length]}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`]} />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            {concentrationData.length > 0 && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {concentrationData.map((entry) => (
+                                        <Badge key={entry.name} variant="secondary" className="justify-between">
+                                            <span className="flex-1">{entry.name}</span>
+                                            <span className="font-semibold">{entry.value.toFixed(1)}%</span>
+                                            <div className="w-4 h-2 ml-2 rounded-full bg-[hsl(var(--chart-${(index % 5) + 1}))]" />
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
                             <div className="space-y-2 mt-4">
                                 {riskFeedbacks.slice(0, 3).map((fb) => (
                                     <Alert key={fb.id} variant="destructive">
@@ -186,16 +227,27 @@ export default function AICoachPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Análisis de Costos</CardTitle>
-                            <CardDescription>Eficiencia de transacciones y slippage.</CardDescription>
+                            <CardDescription>
+                                {isWeeklyData 
+                                    ? "Costos semanales de transacciones y slippage." 
+                                    : "Costos mensuales de transacciones y slippage."
+                                }
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <ResponsiveContainer width="100%" height={250}>
                                 <LineChart data={costsData}>
                                     <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="month" />
+                                    <XAxis 
+                                        dataKey="period" 
+                                        tickFormatter={(value) => formatPeriodLabel(value, isWeeklyData)}
+                                    />
                                     <YAxis />
-                                    <Tooltip />
-                                    <Line type="monotone" dataKey="costs" stroke="#8884d8" />
+                                    <Tooltip 
+                                        formatter={(value: number) => [`$${value.toFixed(2)}`, 'Costo']}
+                                        labelFormatter={(value) => formatPeriodLabel(value, isWeeklyData)}
+                                    />
+                                    <Line type="monotone" dataKey="costs" stroke="#8884d8" strokeWidth={2}/>
                                 </LineChart>
                             </ResponsiveContainer>
                             <div className="space-y-2 mt-4">
