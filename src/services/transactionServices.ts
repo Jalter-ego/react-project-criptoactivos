@@ -14,7 +14,7 @@ export interface Transaction {
   price: number;
   activeSymbol: string;
   portafolioId: string;
-  createdAt?: string; 
+  createdAt: string; 
 }
 
 export interface CreateTransaction {

@@ -1,9 +1,26 @@
 import { usePortafolio } from "@/hooks/PortafolioContext";
-import { IconCard, IconChartBar, IconRefresh, IconTrophy, IconUser } from "@/lib/icons";
+import { IconCard, IconChartBar, IconRefresh, IconTrophy } from "@/lib/icons";
+import { portafolioServices } from "@/services/portafolioServices";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 
 export default function CardHeaders(){
     const { currentPortafolio } = usePortafolio()
+    const [totalValue,setTotalValue] = useState<number>(0);
+    useEffect(()=>{
+        initFetch();
+    },[])
+
+    const initFetch = async() => {
+        try {
+            const total = await portafolioServices.findTotalValueOfPortafolio(currentPortafolio?.id||'')
+            setTotalValue(total.totalValue)
+        } catch (err) {
+            toast.error("error al traer el valor total")
+            console.log(err);
+        }
+    }
     return(
         <section className="w-full flex max-md:flex-col gap-6 py-2">
                     <div className="w-full h-32 bg-card rounded-md p-3 border shadow-lg">
@@ -37,12 +54,13 @@ export default function CardHeaders(){
                                 <IconChartBar size={58} />
                             </div>
                             <div>
-                                <p className="text-right">Historial</p>
+                                <p className="text-right">Valor Total</p>
+                                <p className="text-3xl">${totalValue.toFixed(2)}</p>
                             </div>
                         </div>
                         <div className="flex items-center mt-2 text-sm gap-1 text-muted-foreground">
-                            📅
-                            <p>Ultimo hace 3 dias</p>
+                            💰
+                            <p>Invertido: $ {currentPortafolio?.invested} | Disponible: ${currentPortafolio?.cash.toFixed(2)}</p>
                         </div>
                     </div>
 
@@ -52,12 +70,13 @@ export default function CardHeaders(){
                                 <IconTrophy size={58} />
                             </div>
                             <div>
-                                <p className="text-right">Ranking</p>
+                                <p className="text-right">P&L Total</p>
+                                <p className="text-3xl text-green-500">+2,450.80</p>
                             </div>
                         </div>
                         <div className="flex items-center mt-2 text-sm gap-1 text-muted-foreground">
-                            <IconUser size={20} />
-                            <p>107,239 inversores activos</p>
+                            📈
+                            <p>Win Rate: 68% | Mejor Trade: +1,200.50</p>
                         </div>
                     </div>
                 </section>

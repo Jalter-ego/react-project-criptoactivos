@@ -15,6 +15,7 @@ export interface PortafolioWithHoldings {
   id: string;
   name: string;
   cash: number;
+  invested: number
   userId: string;
   holdings: Holding[];
 }
@@ -23,6 +24,7 @@ export interface Portafolio {
   id: string;
   name: string;
   cash: number;
+  invested: number
   userId: string;
 }
 
@@ -34,8 +36,6 @@ export interface CreatePortafolio {
 
 export interface UpdatePortafolio {
   name?: string;
-  cash?: number;
-  userId?: string;
 }
 
 export interface PortafolioSnapshot {
@@ -63,6 +63,11 @@ export const portafolioServices = {
 
   findOne: async (id: string): Promise<PortafolioWithHoldings> => {
     const res = await axios.get(`${API_URL}/${id}`);
+    return res.data;
+  },
+
+  findTotalValueOfPortafolio: async (id: string): Promise<{totalValue:number}> => {
+    const res = await axios.get(`${API_URL}/${id}/value`);
     return res.data;
   },
 

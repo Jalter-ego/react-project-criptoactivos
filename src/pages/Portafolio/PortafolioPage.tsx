@@ -72,7 +72,6 @@ export default function PortfolioPage() {
     try {
       const data: UpdatePortafolio = {
         name: editingName,
-        cash: editingCash,
       };
       const updated = await portafolioServices.update(editingPortfolio.id, data);
       setPortfolios(portfolios.map(p => p.id === editingPortfolio.id ? { ...updated, holdings: editingPortfolio.holdings } : p));
