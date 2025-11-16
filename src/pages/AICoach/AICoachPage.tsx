@@ -145,7 +145,7 @@ export default function AICoachPage() {
                                 <ResponsiveContainer width="100%" height={300}>
                                     <PieChart>
                                         <Pie
-                                            data={concentrationData}
+                                            data={concentrationData as any}
                                             cx="50%"
                                             cy="50%"
                                             outerRadius={80}

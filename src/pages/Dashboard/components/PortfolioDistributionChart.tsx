@@ -46,13 +46,13 @@ export default function PortfolioDistributionChart({ portafolioId }: PortfolioDi
         <ResponsiveContainer width="100%" height={300}>
             <PieChart>
                 <Pie
-                    data={data}
+                    data={data as any}
                     cx="50%"
                     cy="50%"
                     outerRadius={80}
                     dataKey="value"
                     nameKey="name"
-                    label={({ name, value }) => `${name}: ${value.toFixed(1)}%`}
+                    label={({ name, value }) => `${name}: ${(value as number).toFixed(1)}%`}
                 >
                     {data.map((entry, index) => (
                         <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
