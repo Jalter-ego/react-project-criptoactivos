@@ -9,6 +9,8 @@ export interface Holding {
   quantity: number;
   portafolioId: string;
   activeSymbol: string;
+  currentPrice?: number;
+  totalValue?:number
 }
 
 export interface PortafolioWithHoldings {
@@ -17,6 +19,8 @@ export interface PortafolioWithHoldings {
   cash: number;
   invested: number
   userId: string;
+  createdAt: Date;
+  updatedAt: Date;
   holdings: Holding[];
 }
 
@@ -26,6 +30,8 @@ export interface Portafolio {
   cash: number;
   invested: number
   userId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreatePortafolio {
@@ -45,6 +51,19 @@ export interface PortafolioSnapshot {
   portafolioId: string;
 }
 
+export interface RiskMetrics {
+  sortinoRatio: number;
+  sharpeRatio: number;
+  averageReturn: number;
+  volatility: number;
+  downsideVolatility: number;
+  totalReturn: number;
+  maxDrawdown: number;
+  dataPoints: number;
+  periodDays: number;
+  riskFreeRate: number;
+}
+
 export const portafolioServices = {
   create: async (data: CreatePortafolio): Promise<Portafolio> => {
     const res = await axios.post(API_URL, data);
@@ -61,6 +80,11 @@ export const portafolioServices = {
     return res.data;
   },
 
+  findOneWithPrices: async (portafolioId: string): Promise<PortafolioWithHoldings> => {
+    const res = await axios.get(`${API_URL}/${portafolioId}/detailed`);
+    return res.data;
+  },
+
   findOne: async (id: string): Promise<PortafolioWithHoldings> => {
     const res = await axios.get(`${API_URL}/${id}`);
     return res.data;
@@ -73,6 +97,11 @@ export const portafolioServices = {
 
   findSnapshots: async (portafolioId: string): Promise<PortafolioSnapshot[]> => {
     const res = await axios.get(`${API_URL}/${portafolioId}/snapshots`);
+    return res.data;
+  },
+
+  getRiskMetrics: async (id: string): Promise<RiskMetrics> => {
+    const res = await axios.get(`${API_URL}/${id}/metrics`);
     return res.data;
   },
 

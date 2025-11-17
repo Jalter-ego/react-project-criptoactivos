@@ -89,7 +89,7 @@ export default function PerformanceChart({ portafolioId }: PerformanceChartProps
     const gradientId = "portfolioGradient";
 
     return (
-        <div className="bg-card p-6 rounded-xl shadow-md border border-border h-[400px] flex flex-col">
+        <div className="bg-card p-6 rounded-xl shadow-md border border-border h-[500px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
                 <div>
                     <h3 className="text-xl font-bold text-foreground">Rendimiento del Portafolio</h3>

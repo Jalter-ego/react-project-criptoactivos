@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import SpinnerComponent from "@/components/Shared/Spinner";
 import { getFeedbackColor } from "../TradePage/utils/tradeUtils";
 import { aiServices, type PortfolioInsights } from "@/services/aiServices";
+import SessionAnalysisSummary from "./components/SessionAnalysisSummary";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -100,11 +101,12 @@ export default function AICoachPage() {
             </Alert>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
                     <TabsTrigger value="recientes">Recientes</TabsTrigger>
                     <TabsTrigger value="riesgos">Riesgos ({riskFeedbacks.length})</TabsTrigger>
                     <TabsTrigger value="comportamiento">Comportamiento ({behaviorFeedbacks.length})</TabsTrigger>
                     <TabsTrigger value="costos">Costos ({costFeedbacks.length})</TabsTrigger>
+                    <TabsTrigger value="analisis-final">Análisis Final</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="recientes" className="space-y-4">
@@ -259,6 +261,13 @@ export default function AICoachPage() {
                             </div>
                         </CardContent>
                     </Card>
+                </TabsContent>
+                <TabsContent value="analisis-final" className="space-y-6">
+                    <SessionAnalysisSummary 
+                        feedbacks={feedbacks} 
+                        insights={insights}
+                        portafolioName={currentPortafolio?.name || ''}
+                    />
                 </TabsContent>
             </Tabs>
 
