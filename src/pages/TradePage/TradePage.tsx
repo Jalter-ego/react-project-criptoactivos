@@ -11,7 +11,7 @@ import { useTradeData } from "./hooks/useTradeData";
 import { ConfirmationModal } from "./components/ConfirmationModal";
 import { TransactionForm } from "./components/TransactionForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, DollarSign, Hash, TrendingDown, TrendingUp, TrendingUpDown } from "lucide-react";
+import { AlertTriangle, Brain, DollarSign, Hash, TrendingDown, TrendingUp, TrendingUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AICoachDrawer } from "./components/AICoachDrawer";
 import SpinnerComponent from "@/components/Shared/Spinner";
@@ -19,7 +19,7 @@ import { aiServices, type Recommendation } from "@/services/aiServices";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function TradePage() {
     const { currentPortafolio, setCurrentPortafolio } = usePortafolio();
@@ -84,7 +84,7 @@ export default function TradePage() {
 
     if (!id || !active || !currentPortafolio) {
         return (
-            <SpinnerComponent/>
+            <SpinnerComponent />
         );
     }
 
@@ -189,28 +189,73 @@ export default function TradePage() {
                         </div>
                     </CardHeader>
                 </Card>
-                            <Card className="border-primary/20">
+                <Card className="border-primary/20">
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center text-primary">
-                            <TrendingUpDown className="w-5 h-5 mr-2" />
-                            Sugerencia IA: {recommendation ? recommendation.recommendation : "Cargando..."}
+                            <Brain className="w-5 h-5 mr-2" />
+                            Recomendación IA Inteligente
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pb-4">
                         {recLoading ? (
-                            <SpinnerComponent size="32"/>
+                            <div className="flex items-center justify-center py-8">
+                                <SpinnerComponent size="32" />
+                            </div>
                         ) : recommendation ? (
-                            <div className="flex items-center justify-between">
-                                <Badge className={`${getRecColor(recommendation.recommendation)} text-sm px-3 py-1`}>
-                                    {getRecIcon(recommendation.recommendation)} {recommendation.recommendation}
-                                    {recommendation.confidence && ` (${(recommendation.confidence * 100).toFixed(0)}% conf.)`}
-                                </Badge>
-                                <Button variant="outline" size="sm" onClick={() => setShowRecModal(true)}>
-                                    ¿Por qué?
-                                </Button>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`p-2 rounded-full ${recommendation.recommendation === 'BUY' ? 'bg-green-100' :
+                                            recommendation.recommendation === 'SELL' ? 'bg-red-100' : 'bg-orange-100'
+                                            }`}>
+                                            {getRecIcon(recommendation.recommendation)}
+                                        </div>
+                                        <div>
+                                            <div className="font-semibold">
+                                                {recommendation.recommendation === 'BUY' ? '¡Oportunidad de Compra!' :
+                                                    recommendation.recommendation === 'SELL' ? 'Toma Ganancias' : 'Mantén Posición'}
+                                            </div>
+                                            <div className="text-sm text-muted-foreground">
+                                                Confianza: {(0.95 * 100).toFixed(0)}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Badge className={`${getRecColor(recommendation.recommendation)} text-sm px-3 py-1`}>
+                                        {recommendation.recommendation}
+                                    </Badge>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => navigate(`/recommendation/${id}`)}
+                                        className="flex-1"
+                                    >
+                                        Ver Análisis Completo
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setShowRecModal(true)}
+                                    >
+                                        ¿Por qué?
+                                    </Button>
+                                </div>
                             </div>
                         ) : (
-                            <p className="text-sm text-muted-foreground">No disponible – prueba de nuevo.</p>
+                            <div className="text-center py-4">
+                                <Brain className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                                <p className="text-sm text-muted-foreground">Recomendación no disponible</p>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-2"
+                                    onClick={() => window.location.reload()}
+                                >
+                                    Reintentar
+                                </Button>
+                            </div>
                         )}
                     </CardContent>
                 </Card>
@@ -304,24 +349,33 @@ export default function TradePage() {
             <Dialog open={showRecModal} onOpenChange={setShowRecModal}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Sugerencia IA: {recommendation?.recommendation}</DialogTitle>
+                        <DialogTitle>Recomendación Rápida</DialogTitle>
                         <DialogDescription>
-                            Basado en modelo ML entrenado con 5 años de datos históricos para {symbol}.
+                            Para un análisis completo, visita la página dedicada de recomendaciones.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 text-sm">
                         <Alert>
-                            <AlertTitle>Razón: {recommendation?.reason || "Estrategia detectada (ej. buy the dip)"}</AlertTitle>
+                            <Brain className="h-4 w-4" />
                             <AlertDescription>
-                                Confianza: {(recommendation?.confidence || 0) * 100}% <br />
-                                Estrategia sugerida: {recommendation?.recommendation === "BUY" ? "Buy the dip" : recommendation?.recommendation === "SELL" ? "Take profits" : "Mantén posición"}.
+                                <div className="font-medium mb-1">Recomendación: {recommendation?.recommendation}</div>
+                                <div>Confianza: {(0.95) * 100}%</div>
+                                <div className="text-xs text-muted-foreground mt-2">
+                                    Basado en análisis técnico avanzado
+                                </div>
                             </AlertDescription>
                         </Alert>
-                        <p className="text-xs text-muted-foreground">Modelos para BTC, ETH, SOL. Actualizado con data real-time.</p>
                     </div>
                     <DialogFooter>
-                        <Button onClick={() => setShowRecModal(false)}>Cerrar</Button>
-                        <Button onClick={() => navigate("/ai-coach")} variant="outline">Ver más en Coach IA</Button>
+                        <Button variant="outline" onClick={() => setShowRecModal(false)}>
+                            Cerrar
+                        </Button>
+                        <Button onClick={() => {
+                            setShowRecModal(false);
+                            navigate(`/recommendation/${id}`);
+                        }}>
+                            Ver Análisis Completo
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

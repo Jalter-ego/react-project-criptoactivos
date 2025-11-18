@@ -13,6 +13,7 @@ import Layout from "./Layout";
 import AICoachPage from "./pages/AICoach/AICoachPage";
 import PortafolioDetailPage from "./pages/Portafolio/PortafolioDetailPage";
 import ReportsPage from "./pages/Reports/ReportsPage";
+import RecommendationDetailPage from "./pages/TradePage/RecomendationDetailPage";
 
 export function Router() {
     return (
@@ -29,6 +30,7 @@ export function Router() {
                 <Route path="/reportes" element={<ReportsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/trade/:id" element={<TradePage />} />
+                <Route path="/recommendation/:symbol" element={<RecommendationDetailPage/>} />
                 <Route path="/asesor-ia" element={<AICoachPage />} />
             </Route>
 

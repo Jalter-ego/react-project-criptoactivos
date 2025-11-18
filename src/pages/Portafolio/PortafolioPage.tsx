@@ -12,7 +12,6 @@ import { useUser } from "@/hooks/useContext";
 import { toast } from "sonner";
 import PerformanceChart from "../Dashboard/components/PerformanceChart";
 import SpinnerComponent from "@/components/Shared/Spinner";
-import RiskMetricsCard from "./components/RiskMetricsCard";
 import { useNavigate } from "react-router-dom";
 
 export default function PortfolioPage() {
@@ -312,14 +311,7 @@ export default function PortfolioPage() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold mb-4">Rendimiento del Portafolio Actual</h2>
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="xl:col-span-2">
-                <PerformanceChart portafolioId={currentPortafolio.id} />
-              </div>
-              <div>
-                <RiskMetricsCard portafolioId={currentPortafolio.id} />
-              </div>
-            </div>
+            <PerformanceChart portafolioId={currentPortafolio.id} />
           </div>
         </div>
       )}
