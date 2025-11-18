@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, DollarSign, TrendingUp, PieChart, Calendar } from "lucide-react";
-import PerformanceChart from "../Dashboard/components/PerformanceChart";
 import RiskMetricsCard from "./components/RiskMetricsCard";
 import SpinnerComponent from "@/components/Shared/Spinner";
 import { activeIcons } from "@/lib/activeIcons";
@@ -95,6 +94,35 @@ export default function PortafolioDetailPage() {
             </Button>
           )}
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Información del Portafolio
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="font-medium text-muted-foreground">ID:</span>
+                <div className="font-mono text-xs mt-1">{portfolio.id}</div>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Usuario:</span>
+                <div className="font-mono text-xs mt-1">{user?.name}</div>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Creado:</span>
+                <div className="mt-1">{new Date(portfolio.createdAt).toLocaleString()}</div>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Última actualización:</span>
+                <div className="mt-1">{new Date(portfolio.updatedAt).toLocaleString()}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
   
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
@@ -189,46 +217,11 @@ export default function PortafolioDetailPage() {
           </CardContent>
         </Card>
   
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Información del Portafolio
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-muted-foreground">ID:</span>
-                <div className="font-mono text-xs mt-1">{portfolio.id}</div>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Usuario:</span>
-                <div className="font-mono text-xs mt-1">{user?.name}</div>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Creado:</span>
-                <div className="mt-1">{new Date(portfolio.createdAt).toLocaleString()}</div>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Última actualización:</span>
-                <div className="mt-1">{new Date(portfolio.updatedAt).toLocaleString()}</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
   
-        {/* Análisis de Rendimiento y Riesgo */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Análisis de Rendimiento</h2>
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2">
-              <PerformanceChart portafolioId={portfolio.id} />
-            </div>
-            <div>
-              <RiskMetricsCard portafolioId={portfolio.id} />
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold">Análisis Completo de Rendimiento</h2>
+          <RiskMetricsCard portafolioId={portfolio.id} />
         </div>
       </div>
     );
