@@ -1,4 +1,4 @@
-import { IconAssets, IconDashboard, IconPortfolio, IconSettings, IconTransactions } from "./icons";
+import { IconAssets, IconDashboard, IconPortfolio, IconReport, IconSettings, IconTransactions } from "./icons";
 
 export const listIcons = [
     { name: 'dashboard', icon: IconDashboard },
@@ -6,5 +6,6 @@ export const listIcons = [
     { name: 'transacciones', icon: IconTransactions },
     { name: 'asesor-ia', icon: IconTransactions },
     { name: 'portafolios', icon: IconPortfolio },
+    { name: 'reportes', icon: IconReport },
     { name: 'settings', icon: IconSettings },
 ]
