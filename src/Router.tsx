@@ -12,6 +12,7 @@ import TransactionsPage from "./pages/TransactionsPage/TransactionsPage";
 import Layout from "./Layout";
 import AICoachPage from "./pages/AICoach/AICoachPage";
 import PortafolioDetailPage from "./pages/Portafolio/PortafolioDetailPage";
+import ReportsPage from "./pages/Reports/ReportsPage";
 
 export function Router() {
     return (
@@ -25,6 +26,7 @@ export function Router() {
                 <Route path="/portafolios" element={<PortfolioPage />} />
                 <Route path="/portafolios/:id" element={<PortafolioDetailPage />} />
                 <Route path="/transacciones" element={<TransactionsPage />} />
+                <Route path="/reportes" element={<ReportsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/trade/:id" element={<TradePage />} />
                 <Route path="/asesor-ia" element={<AICoachPage />} />
