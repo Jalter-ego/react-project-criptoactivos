@@ -1,6 +1,30 @@
+/* src/pages/Home/HomePage.css */
 #home-page {
-    background-image: url('/src/assets/F1.jpg');
+    background-image: 
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+        url('/src/assets/F1.jpg');
     background-size: cover;
     background-position: center;
-    
+    background-attachment: fixed;
+}
+
+/* Añadir animaciones suaves */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.home-section {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Mejorar el contraste del texto */
+#home-page h1, #home-page h2, #home-page h3, #home-page h4 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
