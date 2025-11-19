@@ -61,7 +61,7 @@ const Login: React.FC = () => {
       </div>
       <div className="w-[50%] flex flex-col items-center justify-between lg:px-52 lg:pt-8 lg:pb-40">
         <h1 className="text-4xl font-bold mb-4 text-foreground">
-          TradingView
+          TRADEBOX
         </h1>
 
         <div>
@@ -182,9 +182,9 @@ const Login: React.FC = () => {
           }
 
           <div className="flex items-center my-6">
-            <div className="flex-grow h-px bg-gray-300"></div>
+            <div className="grow h-px bg-gray-300"></div>
             <span className="px-4 text-sm text-gray-500">o</span>
-            <div className="flex-grow h-px bg-gray-300"></div>
+            <div className="grow h-px bg-gray-300"></div>
           </div>
 
           <div className="flex justify-center">

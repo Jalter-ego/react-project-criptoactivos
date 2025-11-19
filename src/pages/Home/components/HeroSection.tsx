@@ -22,7 +22,7 @@ export default function HeroSection() {
     return (
         <>
             <section className="min-h-screen flex items-center justify-center px-4">
-                <div className="max-w-6xl mx-auto text-center">
+                <div className="max-w-6xl pt-8 min-h-dvh text-center">
                     <div className="mb-8">
                         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
                             <Zap className="w-4 h-4 text-yellow-400" />
@@ -43,7 +43,9 @@ export default function HeroSection() {
                         <Button
                             onClick={handleNavigation}
                             size="lg"
-                            className="bg-white text-black hover:bg-white/90 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-white/20 transition-all duration-300 group"
+                            className="bg-white text-black hover:bg-white/90 px-8 py-4 text-lg 
+                                font-semibold rounded-xl shadow-2xl hover:shadow-white/20 transition-all 
+                                duration-300 group cursor-pointer"
                         >
                             Comenzar Gratis
                             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

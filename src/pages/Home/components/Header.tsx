@@ -13,18 +13,7 @@ export default function Header() {
         <>
             <header className="w-full h-16 flex items-center justify-between px-4">
                 <div>
-                    <h1 className="text-2xl font-medium">TradingView</h1>
-                </div>
-                <div className="flex gap-x-6 text-md font-semibold">
-                    <p>
-                        Productos
-                    </p>
-                    <p>
-                        Comunidad
-                    </p>
-                    <p>
-                        Más
-                    </p>
+                    <h1 className="text-2xl font-medium">TradeBox</h1>
                 </div>
                 <div>
                     <UserMenu

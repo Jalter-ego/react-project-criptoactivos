@@ -783,7 +783,7 @@ export default function RecomendationDetailPage() {
 
                                 <div className="pt-4 border-t">
                                     <p className="text-xs text-muted-foreground">
-                                        <strong>TradingView AI</strong> - Tecnología avanzada para traders inteligentes. 
+                                        <strong>TradeBox AI</strong> - Tecnología avanzada para traders inteligentes. 
                                         Usa esta información como complemento a tu análisis personal.
                                     </p>
                                 </div>
