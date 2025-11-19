@@ -8,7 +8,7 @@ export default function Footer() {
             <div className="max-w-6xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div>
-                        <h3 className="text-xl font-bold mb-4">TradingView AI</h3>
+                        <h3 className="text-xl font-bold mb-4">TRADEBOX AI</h3>
                         <p className="text-white/60 text-sm leading-relaxed">
                             La plataforma definitiva para traders inteligentes. 
                             Combina análisis técnico con IA avanzada.
@@ -49,7 +49,7 @@ export default function Footer() {
                 <Separator className="bg-white/10 mb-8" />
                 
                 <div className="flex flex-col md:flex-row justify-between items-center text-sm text-white/60">
-                    <div>© 2024 TradingView AI. Todos los derechos reservados.</div>
+                    <div>© 2024 TRADEBOX AI. Todos los derechos reservados.</div>
                     <div className="flex gap-6 mt-4 md:mt-0">
                         <a href="#" className="hover:text-white transition-colors">Twitter</a>
                         <a href="#" className="hover:text-white transition-colors">LinkedIn</a>

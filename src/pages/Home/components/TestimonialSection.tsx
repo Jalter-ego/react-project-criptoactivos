@@ -60,7 +60,7 @@ export default function TestimonialsSection() {
                                         {testimonial.avatar}
                                     </div>
                                     <div>
-                                        <div className="font-semibold">{testimonial.name}</div>
+                                        <div className="font-semibold text-white">{testimonial.name}</div>
                                         <div className="text-sm text-white/60">{testimonial.role}</div>
                                     </div>
                                 </div>
