@@ -9,11 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-    ArrowLeft, 
-    TrendingUp, 
-    TrendingDown, 
-    TrendingUpDown, 
+import {
+    ArrowLeft,
+    TrendingUp,
+    TrendingDown,
+    TrendingUpDown,
     Brain,
     BarChart3,
     AlertTriangle,
@@ -43,7 +43,7 @@ export default function RecomendationDetailPage() {
 
     useEffect(() => {
         if (!symbol || !currentPortafolio?.id) return;
-        
+
         const fetchRecommendation = async () => {
             try {
                 setLoading(true);
@@ -200,6 +200,24 @@ export default function RecomendationDetailPage() {
         }
     };
 
+    const algorithmInfo = [
+        {
+            icon: Brain,
+            title: "Aprendizaje por Refuerzo",
+            description: "Agente PPO (Proximal Policy Optimization) entrenado para maximizar el retorno ajustado al riesgo."
+        },
+        {
+            icon: History,
+            title: "Entrenamiento Histórico",
+            description: "Modelo entrenado con 5 años de datos históricos (OHLCV) para identificar patrones de mercado."
+        },
+        {
+            icon: Target,
+            title: "Objetivo de Optimización",
+            description: "El agente busca maximizar el Ratio de Sharpe, priorizando ganancias estables sobre volatilidad."
+        }
+    ];
+
     if (loading) {
         return (
             <div className="container mx-auto p-6">
@@ -242,9 +260,9 @@ export default function RecomendationDetailPage() {
                         Volver al Trading
                     </Button>
                     <div className="flex items-center gap-3">
-                        <img 
-                            src={activeIcons[symbol]} 
-                            alt={symbol} 
+                        <img
+                            src={activeIcons[symbol]}
+                            alt={symbol}
                             className="w-10 h-10 rounded-full"
                         />
                         <div>
@@ -289,11 +307,11 @@ export default function RecomendationDetailPage() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className={`text-2xl font-bold ${confidenceInfo.color} mb-2`}>
-                                        {(0.95 * 100).toFixed(0)}% Confianza
+                                    <div className={`text-lg font-bold ${confidenceInfo.color} mb-2`}>
+                                        Modelo PPO
                                     </div>
-                                    <Badge className={confidenceInfo.color}>
-                                        {confidenceInfo.level}
+                                    <Badge variant="outline" className={confidenceInfo.color}>
+                                        Entrenado & Validado
                                     </Badge>
                                 </div>
                             </div>
@@ -301,24 +319,29 @@ export default function RecomendationDetailPage() {
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                                 <div className="text-center">
-                                    <div className="text-3xl font-bold mb-2 text-green-600">85%</div>
-                                    <div className="text-sm text-muted-foreground">Precisión Histórica</div>
-                                    <Progress value={85} className="mt-2 h-3" />
+                                    <div className="text-3xl font-bold mb-2 text-green-600">
+                                        {recommendation.recommendation === "HOLD" ? "Defensiva" : "Activa"}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">Tipo de Estrategia</div>
+                                    <Progress value={100} className="mt-2 h-3 bg-green-100" />
                                 </div>
+
                                 <div className="text-center">
-                                    <div className="text-3xl font-bold mb-2 text-blue-600">24h</div>
-                                    <div className="text-sm text-muted-foreground">Ventana de Análisis</div>
+                                    <div className="text-3xl font-bold mb-2 text-blue-600">30 Días</div>
+                                    <div className="text-sm text-muted-foreground">Ventana de Contexto</div>
                                     <Progress value={100} className="mt-2 h-3 bg-blue-100" />
                                 </div>
+
                                 <div className="text-center">
-                                    <div className="text-3xl font-bold mb-2 text-purple-600">5+</div>
-                                    <div className="text-sm text-muted-foreground">Años de Datos</div>
+                                    <div className="text-3xl font-bold mb-2 text-purple-600">5 Años</div>
+                                    <div className="text-sm text-muted-foreground">Datos Históricos</div>
                                     <Progress value={100} className="mt-2 h-3 bg-purple-100" />
                                 </div>
+
                                 <div className="text-center">
                                     <Award className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
-                                    <div className="text-sm text-muted-foreground">Modelo Certificado</div>
-                                    <div className="text-xs text-muted-foreground mt-1">IA Avanzada</div>
+                                    <div className="text-sm text-muted-foreground">Agente RL</div>
+                                    <div className="text-xs text-muted-foreground mt-1">Stable-Baselines3</div>
                                 </div>
                             </div>
                         </CardContent>
@@ -376,25 +399,25 @@ export default function RecomendationDetailPage() {
                         </Card>
 
                         <Card>
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <BarChart3 className="w-5 h-5" />
-                                    Indicadores
-                                </CardTitle>
+                            <CardHeader>
+                                <CardTitle className="text-lg">Datos Analizados</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
-                                        <span className="text-sm">RSI:</span>
-                                        <span className="font-medium text-green-600">65</span>
+                                        <span className="text-sm">Ventana de Observación:</span>
+                                        <span className="font-medium">30 Días</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-sm">MACD:</span>
-                                        <span className="font-medium text-blue-600">Bullish</span>
+                                        <span className="text-sm">Frecuencia de Datos:</span>
+                                        <span className="font-medium">Diaria (Cierre)</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-sm">Momentum:</span>
-                                        <span className="font-medium text-purple-600">Strong</span>
+                                        <span className="text-sm">Estado del Portafolio:</span>
+                                        <span className="font-medium">Considerado</span>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground mt-2">
+                                        *El modelo toma decisiones basándose en la secuencia de precios de los últimos 30 días y tu posición actual de efectivo/activos.
                                     </div>
                                 </div>
                             </CardContent>
@@ -415,8 +438,8 @@ export default function RecomendationDetailPage() {
                                 <div>
                                     <h4 className="font-semibold mb-3">Razón Principal de la Recomendación</h4>
                                     <p className="text-muted-foreground leading-relaxed">
-                                        {recommendation.reason || 
-                                        "Basado en patrones técnicos identificados por el algoritmo de machine learning, que detectó una configuración favorable en el mercado. El modelo considera múltiples factores incluyendo tendencias históricas, momentum actual y análisis técnico avanzado."}
+                                        {recommendation.reason ||
+                                            "Basado en patrones técnicos identificados por el algoritmo de machine learning, que detectó una configuración favorable en el mercado. El modelo considera múltiples factores incluyendo tendencias históricas, momentum actual y análisis técnico avanzado."}
                                     </p>
                                 </div>
 
@@ -501,20 +524,16 @@ export default function RecomendationDetailPage() {
                                 </div>
 
                                 <div>
-                                    <h4 className="font-semibold mb-3">Algoritmo Utilizado</h4>
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <Zap className="w-4 h-4 text-yellow-500" />
-                                            <span><strong>Random Forest:</strong> Ensemble learning para mayor precisión</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Brain className="w-4 h-4 text-blue-500" />
-                                            <span><strong>Deep Learning:</strong> Redes neuronales para patrones complejos</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Target className="w-4 h-4 text-green-500" />
-                                            <span><strong>Análisis Técnico:</strong> Indicadores clásicos + custom</span>
-                                        </div>
+                                    <h4 className="font-semibold mb-3">Tecnología del Agente</h4>
+                                    <div className="space-y-3 text-sm">
+                                        {algorithmInfo.map((item, i) => (
+                                            <div key={i} className="flex items-start gap-3">
+                                                <item.icon className="w-5 h-5 text-blue-500 mt-0.5" />
+                                                <div>
+                                                    <strong>{item.title}:</strong> {item.description}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -523,7 +542,7 @@ export default function RecomendationDetailPage() {
                                     <AlertDescription>
                                         <div className="font-medium">Modelo Certificado</div>
                                         <div className="text-sm mt-1">
-                                            Este modelo ha sido validado con datos históricos de los últimos 5 años, 
+                                            Este modelo ha sido validado con datos históricos de los últimos 5 años,
                                             mostrando una precisión del 85% en condiciones de mercado similares.
                                         </div>
                                     </AlertDescription>
@@ -549,23 +568,20 @@ export default function RecomendationDetailPage() {
                                 <div className="space-y-4">
                                     {specificRecommendations.map((rec, index) => (
                                         <div key={index} className="flex items-start gap-3 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                                            <div className={`p-2 rounded-full ${
-                                                rec.priority === 'high' ? 'bg-red-100' :
-                                                rec.priority === 'medium' ? 'bg-yellow-100' : 'bg-blue-100'
-                                            }`}>
-                                                <rec.icon className={`w-4 h-4 ${
-                                                    rec.priority === 'high' ? 'text-red-600' :
-                                                    rec.priority === 'medium' ? 'text-yellow-600' : 'text-blue-600'
-                                                }`} />
+                                            <div className={`p-2 rounded-full ${rec.priority === 'high' ? 'bg-red-100' :
+                                                    rec.priority === 'medium' ? 'bg-yellow-100' : 'bg-blue-100'
+                                                }`}>
+                                                <rec.icon className={`w-4 h-4 ${rec.priority === 'high' ? 'text-red-600' :
+                                                        rec.priority === 'medium' ? 'text-yellow-600' : 'text-blue-600'
+                                                    }`} />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <h4 className="font-medium">{rec.title}</h4>
-                                                    <Badge variant="outline" className={`text-xs ${
-                                                        rec.priority === 'high' ? 'border-red-300 text-red-700' :
-                                                        rec.priority === 'medium' ? 'border-yellow-300 text-yellow-700' :
-                                                        'border-blue-300 text-blue-700'
-                                                    }`}>
+                                                    <Badge variant="outline" className={`text-xs ${rec.priority === 'high' ? 'border-red-300 text-red-700' :
+                                                            rec.priority === 'medium' ? 'border-yellow-300 text-yellow-700' :
+                                                                'border-blue-300 text-blue-700'
+                                                        }`}>
                                                         {rec.priority === 'high' ? 'Alta' : rec.priority === 'medium' ? 'Media' : 'Baja'}
                                                     </Badge>
                                                 </div>
@@ -713,8 +729,8 @@ export default function RecomendationDetailPage() {
                                     <AlertDescription className="text-yellow-800">
                                         <div className="font-medium">Importante Recordatorio</div>
                                         <div className="text-sm mt-1">
-                                            Esta recomendación se basa únicamente en análisis técnico y algoritmos de machine learning. 
-                                            Los mercados cripto son altamente volátiles y pueden experimentar cambios bruscos. 
+                                            Esta recomendación se basa únicamente en análisis técnico y algoritmos de machine learning.
+                                            Los mercados cripto son altamente volátiles y pueden experimentar cambios bruscos.
                                             No constituye asesoramiento financiero personalizado.
                                         </div>
                                     </AlertDescription>
@@ -765,7 +781,7 @@ export default function RecomendationDetailPage() {
                                     <AlertDescription>
                                         <div className="font-medium text-sm">No es asesoramiento financiero</div>
                                         <div className="text-xs mt-1">
-                                            Esta herramienta proporciona información educativa basada en algoritmos. 
+                                            Esta herramienta proporciona información educativa basada en algoritmos.
                                             No garantiza resultados futuros ni constituye asesoramiento financiero personalizado.
                                         </div>
                                     </AlertDescription>
@@ -783,7 +799,7 @@ export default function RecomendationDetailPage() {
 
                                 <div className="pt-4 border-t">
                                     <p className="text-xs text-muted-foreground">
-                                        <strong>TradeBox AI</strong> - Tecnología avanzada para traders inteligentes. 
+                                        <strong>TradeBox AI</strong> - Tecnología avanzada para traders inteligentes.
                                         Usa esta información como complemento a tu análisis personal.
                                     </p>
                                 </div>
@@ -794,7 +810,7 @@ export default function RecomendationDetailPage() {
             </Tabs>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t">
-                <Button 
+                <Button
                     onClick={() => navigate(`/trade/${symbol}`)}
                     className="flex-1"
                     size="lg"
@@ -802,8 +818,8 @@ export default function RecomendationDetailPage() {
                     <Zap className="w-5 h-5 mr-2" />
                     {config.actionText}
                 </Button>
-                <Button 
-                    variant="outline" 
+                <Button
+                    variant="outline"
                     onClick={() => navigate('/asesor-ia')}
                     size="lg"
                     className="flex-1"
@@ -811,8 +827,8 @@ export default function RecomendationDetailPage() {
                     <Brain className="w-5 h-5 mr-2" />
                     Ver Más en AI Coach
                 </Button>
-                <Button 
-                    variant="outline" 
+                <Button
+                    variant="outline"
                     onClick={() => navigate('/reportes')}
                     size="lg"
                 >
