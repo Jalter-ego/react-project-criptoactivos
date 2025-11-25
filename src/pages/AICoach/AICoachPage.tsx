@@ -14,6 +14,7 @@ import SpinnerComponent from "@/components/Shared/Spinner";
 import { getFeedbackColor } from "../TradePage/utils/tradeUtils";
 import { aiServices, type PortfolioInsights } from "@/services/aiServices";
 import SessionAnalysisSummary from "./components/SessionAnalysisSummary";
+import LearningCenter from "./components/LearningCenter";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -101,11 +102,12 @@ export default function AICoachPage() {
             </Alert>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                     <TabsTrigger value="recientes">Recientes</TabsTrigger>
                     <TabsTrigger value="riesgos">Riesgos ({riskFeedbacks.length})</TabsTrigger>
                     <TabsTrigger value="comportamiento">Comportamiento ({behaviorFeedbacks.length})</TabsTrigger>
                     <TabsTrigger value="costos">Costos ({costFeedbacks.length})</TabsTrigger>
+                    <TabsTrigger value="lecciones">Lecciones & Nudges</TabsTrigger>
                     <TabsTrigger value="analisis-final">Análisis Final</TabsTrigger>
                 </TabsList>
 
@@ -134,6 +136,9 @@ export default function AICoachPage() {
                             )}
                         </CardContent>
                     </Card>
+                </TabsContent>
+                <TabsContent value="lecciones" className="space-y-4">
+                    <LearningCenter />
                 </TabsContent>
 
                 <TabsContent value="riesgos" className="space-y-4">
