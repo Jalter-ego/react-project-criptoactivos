@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import type { TickerData } from "@/services/activeServices";
 import { type TransactionType } from "@/services/transactionServices";
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Lightbulb } from "lucide-react";
+import { preTradeConcepts } from "@/lib/educationContent";
 
 interface TransactionFormProps {
     symbol: string;
@@ -41,6 +42,7 @@ export const TransactionForm = ({
     onConfirm,
 }: TransactionFormProps) => {
     const maxSliderValue = transactionType === "BUY" ? availableCash : availableAssetQuantity * currentPrice;
+    const concept = preTradeConcepts[transactionType];
 
     return (
         <div className="space-y-6">
@@ -89,6 +91,26 @@ export const TransactionForm = ({
 
                     {error && <Badge className="w-full justify-center">{error}</Badge>}
                     {success && <Badge className="w-full justify-center bg-green-500">{success}</Badge>}
+
+                    <div className="rounded-lg border border-dashed bg-muted/40 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                                <Lightbulb className="w-4 h-4 text-primary" />
+                                {concept.title}
+                            </span>
+                            <Badge variant="outline">{concept.badge}</Badge>
+                        </div>
+                        <ul className="space-y-2 text-xs text-muted-foreground">
+                            {concept.focus.map((item) => (
+                                <li key={item} className="leading-relaxed">
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+                        <p className="text-xs font-medium text-primary">
+                            {concept.reminder}
+                        </p>
+                    </div>
 
                     <Button
                         onClick={onConfirm}

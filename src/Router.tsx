@@ -14,6 +14,7 @@ import AICoachPage from "./pages/AICoach/AICoachPage";
 import PortafolioDetailPage from "./pages/Portafolio/PortafolioDetailPage";
 import ReportsPage from "./pages/Reports/ReportsPage";
 import RecommendationDetailPage from "./pages/TradePage/RecomendationDetailPage";
+import LearningPage from "./pages/Learning/LearningPage";
 
 export function Router() {
     return (
@@ -24,6 +25,7 @@ export function Router() {
                 <Route path="/live-area/:symbol" element={<LiveAreaPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/activos" element={<DetailedActivesTable />} />
+                <Route path="/aprendizaje" element={<LearningPage />} />
                 <Route path="/portafolios" element={<PortfolioPage />} />
                 <Route path="/portafolios/:id" element={<PortafolioDetailPage />} />
                 <Route path="/transacciones" element={<TransactionsPage />} />
