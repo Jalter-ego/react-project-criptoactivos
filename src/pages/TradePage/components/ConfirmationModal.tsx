@@ -1,13 +1,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { confirmPrompts } from "@/lib/educationContent";
+import type { TransactionType } from "@/services/transactionServices";
+import { Lightbulb } from "lucide-react";
 
 interface ConfirmationModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
     isLoading: boolean;
-    transactionType: string;
+    transactionType: TransactionType;
     symbol: string;
     amountUSD: number;
     calculatedQuantity: number;
@@ -26,6 +29,8 @@ export const ConfirmationModal = ({
     currentPrice,
 }: ConfirmationModalProps) => {
     if (!isOpen) return null;
+
+    const prompts = confirmPrompts[transactionType as "BUY" | "SELL"];
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -62,6 +67,17 @@ export const ConfirmationModal = ({
                         <span className="font-semibold">Total:</span>
                         <span className="font-bold text-primary">${(amountUSD).toFixed(2)}</span>
                     </div>
+                </div>
+                <div className="mt-4 rounded-md border border-primary/20 bg-muted/30 p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                        <Lightbulb className="w-4 h-4 text-primary" />
+                        {prompts.title}
+                    </div>
+                    <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
+                        {prompts.bullets.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                        ))}
+                    </ul>
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={onClose} disabled={isLoading}>
